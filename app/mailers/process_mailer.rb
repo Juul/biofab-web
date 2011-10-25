@@ -6,8 +6,14 @@ class ProcessMailer < ActionMailer::Base
     # TODO settings.yml
     @url = "http://localhost:8080/plates/3#!data"
 
+    if system("which fortune > /dev/null")
+      @fortune = `fortune`
+    else
+      @fortune = nil
+    end
+
     mail(:to => user.email, 
-         :subject => "[BIOFABio] Flow cytometer analysis results ready!")
+         :subject => "[FabIO] Flow cytometer analysis results ready!")
 
   end
   

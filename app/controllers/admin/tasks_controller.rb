@@ -7,6 +7,10 @@ class Admin::TasksController < ApplicationController
   end
 
   def delay
+    if !current_user
+      render :text => "please log in"
+      return
+    end
 
     # deliver mail immediately
     # ProcessMailer.flowcyte_completed(current_user).deliver
