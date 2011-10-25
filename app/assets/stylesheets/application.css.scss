@@ -1,0 +1,26 @@
+/*
+ *= require_self 
+*/  
+
+.user_nav {
+  position: absolute;
+  top: 10px;
+  right: 30px;
+}
+
+ol.show {
+  list-style: none;
+}
+
+ol.show .key {
+  display: inline-block;
+  width: 150px;
+  font-weight: bold;
+}
+
+ol.show .value {
+  display: inline-block;
+}
+
+@import "scaffolds.css.scss";
+@import "formtastic.css.scss";
