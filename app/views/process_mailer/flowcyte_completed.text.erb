@@ -3,11 +3,11 @@ Hello fellow worker drone.
 The analysis of your flow cytometer data has been completed
 and is ready for your viewing at:
 
-  <%= @url %>
+  <%=raw @url %>
 
 -- 
 FabIO
 
 <% if @fortune %>
-<%= @fortune %>
+<%=raw @fortune %>
 <% end %>
