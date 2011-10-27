@@ -7,6 +7,7 @@ class PlateLayout < ActiveRecord::Base
   has_many :plates
 
   def well_descriptor_for(part_type_name, row, col)
+    return '' if !id
     well = wells.where(["row = ? AND column = ?", row, col]).includes(:eou).first
     return '' if !well
 
