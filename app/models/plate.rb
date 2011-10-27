@@ -19,9 +19,9 @@ class Plate < ActiveRecord::Base
         Dir.mkdir(out_path)
       end
       
-#      data = r.analyse(out_path, dirname, :pattern => "pltFAB1_", :layout_path => "plate_layouts")
+      data = r.analyse(out_path, dirname, :pattern => "pltFAB1_", :layout_path => "plate_layouts")
 
-      data = eval(File.new(File.join(Rails.root, 'r.data')).readlines.join(''))
+#      data = eval(File.new(File.join(Rails.root, 'r.data')).readlines.join(''))
 
       plate_names = self.scan_for_plates(data_path)
 
