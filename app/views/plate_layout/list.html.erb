@@ -1,0 +1,30 @@
+
+<h1>Plate layouts </h1>
+
+<h3>Your layouts</h3>
+<% if @mine.empty? %>
+  <p>You don't have any layouts.</p>
+<% else %>
+  <ul>
+    <% @mine.each do |layout| %>
+      <li>
+        <%= l layout.created_at, :format => :full %> - <%= link_to layout.name, :action => 'show', :id => layout.id %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+
+<h3>Others' layouts</h3>
+
+<% if @others.empty? %>
+  <p>No-one else has any layouts.</p>
+<% else %>
+  <ul>
+    <% @others.each do |layout| %>
+      <li>
+        <%= l layout.created_at, :format => :full %> - <%= link_to layout.name, :action => 'show', :id => layout.id %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

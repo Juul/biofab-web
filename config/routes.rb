@@ -28,6 +28,8 @@ BiofabWeb::Application.routes.draw do
 
   match ':controller(/:action(/:id(.:format)))', :controller => /admin\/[^\/]+/
 
+  match ':controller(/:action(/:id(.:format)))'
+
 #  match 'user_admin(/:action(/:id))' => 'user_admin'
   
   # The priority is based upon order of creation:

@@ -16,5 +16,11 @@ class ProcessMailer < ActionMailer::Base
          :subject => "[FabIO] Flow cytometer analysis results ready!")
 
   end
+
+  def error(user, exception)
+    @e = exception
+    mail(:to => user.email, 
+         :subject => "[FabIO] An error occurred")
+  end
   
 end

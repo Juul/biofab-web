@@ -15,11 +15,45 @@ class Part < ActiveRecord::Base
   validates :biofab_id, :presence => true, :uniqueness => true
   validates :sequence, :uniqueness => true
 
+
+  def self.promoters
+    joins(:part_type).where("part_types.name = 'Promoter'")
+  end
+
+  def self.promoter_descriptors
+    self.promoters.all.collect {|part| part.descriptor}
+  end
+
+  def self.five_prime_utrs
+    joins(:part_type).where("part_types.name = \"5' UTR\"")
+  end
+
+  def self.five_prime_utr_descriptors
+    self.five_prime_utrs.all.collect {|part| part.descriptor}
+  end
+
+  def self.cdss
+    joins(:part_type).where("part_types.name = 'CDS'")
+  end
+
+  def self.cds_descriptors
+    self.cdss.all.collect {|part| part.descriptor}
+  end
+
+  def self.terminators
+    joins(:part_type).where("part_types.name = 'Terminator'")
+  end
+
+  def self.terminator_descriptors
+    self.terminators.all.collect {|part| part.descriptor}
+  end
+
+  def descriptor
+    "#{biofab_id}: #{description}"
+  end
+
   def to_s
     biofab_id
   end
-
-
-  
 
 end

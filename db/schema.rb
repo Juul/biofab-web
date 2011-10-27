@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111025191041) do
+ActiveRecord::Schema.define(:version => 20111027141316) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.integer  "resource_id",   :null => false
@@ -82,6 +82,8 @@ ActiveRecord::Schema.define(:version => 20111025191041) do
     t.text     "description",              :limit => 255
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.float    "value"
+    t.float    "standard_deviation"
   end
 
   create_table "collections", :force => true do |t|
@@ -114,7 +116,7 @@ ActiveRecord::Schema.define(:version => 20111025191041) do
   create_table "eous", :force => true do |t|
     t.integer  "promoter_id"
     t.integer  "five_prime_utr_id"
-    t.integer  "gene_id"
+    t.integer  "cds_id"
     t.integer  "terminator_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -202,6 +204,27 @@ ActiveRecord::Schema.define(:version => 20111025191041) do
     t.string   "ori"
   end
 
+  create_table "plate_layout_wells", :force => true do |t|
+    t.integer  "plate_layout_id"
+    t.integer  "row"
+    t.integer  "column"
+    t.integer  "eou_id"
+    t.integer  "organism_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "plate_layouts", :force => true do |t|
+    t.string   "name"
+    t.boolean  "hide_global_wells"
+    t.integer  "eou_id"
+    t.integer  "organism_id"
+    t.integer  "user_id"
+    t.integer  "project_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "plate_wells", :force => true do |t|
     t.integer  "plate_id"
     t.integer  "replicate_id"
@@ -213,9 +236,10 @@ ActiveRecord::Schema.define(:version => 20111025191041) do
 
   create_table "plates", :force => true do |t|
     t.string   "name"
-    t.text     "description", :limit => 255
+    t.text     "description",     :limit => 255
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "plate_layout_id"
   end
 
   create_table "projects", :force => true do |t|
@@ -254,6 +278,7 @@ ActiveRecord::Schema.define(:version => 20111025191041) do
     t.text     "description", :limit => 255
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name"
   end
 
   create_table "sequencings", :force => true do |t|

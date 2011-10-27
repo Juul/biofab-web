@@ -1,0 +1,37 @@
+<div class='flow_cyte_container'>
+
+    <h1>Plate data</h1>
+
+    <h2>Plate: <%= @plate.name %></h2>
+
+    <table class='plate_layout'>
+
+      <% 9.times do |row| %>
+        <tr id='<%= "row_#{row}" %>' <%= "class='topmost'" if row == 0 %>>
+        <% 13.times do |col| %>
+         <td id='<%= "row_#{row}_col_#{col}" %>' class='<%= "topmost" if row == 0 %> <%= "leftmost" if col == 0 %>'>
+           <% if (row == 0) && (col > 0) %>
+             <div class='row_number'><%= col %></div>
+           <% elsif (col == 0) && (row > 0) %>
+             <div class='col_number'><%= row_to_letter(row) %></div>            
+           <% end %>
+
+           <% if (row > 0) && (col > 0) %>
+             <% @characterization = @plate.well_characterization(row, col) %>
+             <div class='mean'>
+               <%= @characterization.value.round(2) %>
+             </div>
+             <div class='sd'>
+               <%= @characterization.standard_deviation.round(2) %>
+             </div>
+           <% end %>
+
+         </td>
+        <% end %>
+        </tr>
+      <% end %>
+
+    </table>
+
+
+</div>

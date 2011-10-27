@@ -45,3 +45,7 @@ gem 'rjb'
 gem 'thin'
 
 gem 'delayed_job'
+
+gem 'pry'
+
+gem 'rsruby'

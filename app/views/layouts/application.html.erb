@@ -2,8 +2,18 @@
 <html>
 <head>
   <title>BIOFAB</title>
+  <%= stylesheet_link_tag 'jquery-ui-1.8.16.custom' %>
   <%= stylesheet_link_tag 'application' %>
+
+  <%= javascript_include_tag 'jquery-1.6.2.min' %>
+  <%= javascript_include_tag 'jquery-ui-1.8.16.custom.min' %>
+  <script type='text/javascript'>
+    $.noConflict(); // relinquish jquery control of $ variable
+  </script>
+
+  <%= javascript_include_tag 'prototype' %>
   <%= javascript_include_tag 'application' %>
+
   <%= csrf_meta_tags %>
 </head>
 <body>
