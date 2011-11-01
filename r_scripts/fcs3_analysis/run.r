@@ -187,18 +187,12 @@ run = function(out_path,
 
       # === Save FCS files ===
 
-			if(verbose) {
-        cat("Saving fcs files... ")
-      }
-      tpath = file.path(path,paste("Cleaned_data",pattern,sep="_"),"Cluster1",basename(folders[i]))
-      cat("============tpath")
-      cat(tpath)
-      cat("\n")
 
-			write.flowSet(flowset, file.path(path,paste("Cleaned_data",pattern,sep="_"),"Cluster1",basename(folders[i])),filename=sampleNames(flowset))
+
+			write.flowSet(flowset, file.path(out_path,paste("Cleaned_data",pattern,sep="_"),"Cluster1",basename(folders[i])),filename=sampleNames(flowset))
 
 			if(class(second.peak) == "flowSet") {
-        write.flowSet(second.peak, file.path(path, paste("Cleaned_data",pattern,sep="_"),"Cluster2",basename(folders[i])),filename=sampleNames(second.peak))
+        write.flowSet(second.peak, file.path(out_path, paste("Cleaned_data",pattern,sep="_"),"Cluster2",basename(folders[i])),filename=sampleNames(second.peak))
       }
 
 		} else { # no cleaning
