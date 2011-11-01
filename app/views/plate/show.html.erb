@@ -4,7 +4,7 @@
 
   function show_plot_for(plate_layout_id, plate_name, row, col) {
     var base_path = '/flow_cytometer_output/'+plate_layout_id;
-    var filepath = base_path+'/_'+row+col+'_'+plate_name+'_2_processed.svg';
+    var filepath = base_path+'/_'+row+col+'_'+plate_name+'_2_processed.png';
     console.log(filepath);
     $('plot').src = "";
     $('plot').alt = 'Loading plot for well '+row+col;
