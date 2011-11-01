@@ -2,14 +2,18 @@ class Plate < ActiveRecord::Base
   has_many :wells, :class_name => 'PlateWell'
   belongs_to :plate_layout
 
-  def self.analyze(plate_layout, user, dirname)
+  def self.analyze(plate_layout, fluo_channel, user, dirname)
     begin
-      r = RSRuby.instance
-      r.source(File.join(Rails.root, 'r_scripts', 'fcs3_analysis.r'))
+
       # TODO move path to settings.rb
       input_path = File.join(Rails.root, 'public', 'flow_cytometer_input_data')
-      r.setwd(input_path)
-      
+      script_dir = File.join(Rails.root, 'r_scripts', 'fcs3_analysis')
+
+      # Initialize R and load the r source file
+      r = RSRuby.instance
+      r.setwd(script_dir)
+      r.source(File.join(script_dir, 'fcs3_analysis.r'))
+
       # The current directory to process
       # This will have one subdir per replicate
       data_path = File.join(input_path, dirname)
@@ -18,15 +22,28 @@ class Plate < ActiveRecord::Base
       if !File.directory?(out_path)
         Dir.mkdir(out_path)
       end
-      
-      data = r.analyse(out_path, dirname, :pattern => "pltFAB1_", :layout_path => "plate_layouts")
 
-#      data = eval(File.new(File.join(Rails.root, 'r.data')).readlines.join(''))
+#      f = File.new(File.join(Rails.root, 'foobar.out'))
+#      data = eval(f.readlines.join(''))
+#      f.close
+
+      data = r.run(out_path, data_path, :fluo => fluo_channel)
+
+      # TODO remove this debug code
+      f = File.new(File.join(Rails.root, 'foobar.out'), 'w+')
+      f.puts(data.inspect)
+      f.close
 
       plate_names = self.scan_for_plates(data_path)
 
-      puts "======================"
-      puts "plate names: " + plate_names.inspect
+      # characterizations
+      chars = []
+      8.times do |row|
+        chars[row] = []
+        12.times do |col|
+          chars[row][col] = []
+        end
+      end
 
       plate_names.each do |plate_name|
         plate = Plate.new
@@ -37,18 +54,25 @@ class Plate < ActiveRecord::Base
         plate_data = data[plate_name]
 
         plate_data['mean.GRN.HLin'].each_index do |i|
+          break if i > 95 # don't accept more than 96 wells
 
           mean = plate_data['mean.GRN.HLin'][i]
           sd = plate_data['sd.GRN.HLin'][i]
-          
+
+          col = (i % 12)
+          row = (i / 12)
+
           well = PlateWell.new
-          well.column = ((i % 12) + 1).to_s
-          well.row = ((i / 12) + 1).to_s
+          well.column = (col+1).to_s
+          well.row = (row+1).to_s
           well.replicate = Replicate.new
 
           characterization = Characterization.new
           characterization.value = mean
           characterization.standard_deviation = sd
+
+          chars[row][col] << characterization
+
           well.replicate.characterizations << characterization
 
           well.save!
@@ -59,11 +83,28 @@ class Plate < ActiveRecord::Base
         plate.save!
       end
 
-#      f = File.new('/tmp/foobar.txt', 'w+')
-#      f.puts data.inspect
-#      f.close
+      summary_data = data['Summary']
+
+      # Performances
+
       
-      ProcessMailer.flowcyte_completed(user).deliver
+      chars.each_index do |row|
+        row_a = chars[row]
+        row_a.each_index do |col|
+          col_chars = row_a[col]
+          perf = Performance.new
+          col_chars.each do |char| # loop through the characterizations for the different replicates
+            perf.characterizations << char
+          end
+          i = row * 12 + col
+          perf.value = summary_data['mean.mean.GRN.HLin'][i]
+          perf.standard_deviation = summary_data['sd.mean.GRN.HLin'][i]
+          perf.save!
+        end
+      end
+     
+      
+      ProcessMailer.flowcyte_completed(user, plate_layout.id).deliver
     rescue Exception => e
       ProcessMailer.error(user, e).deliver
     end
@@ -97,6 +138,10 @@ class Plate < ActiveRecord::Base
     plate_names
   end
 
+  def well_at(row, col)
+    wells.where(["row = ? AND column = ?", row.to_s, col.to_s]).first
+  end
+
   # TODO this is hackish
   def well_characterization(row, col)
     well = wells.where(["row = ? AND column = ?", row.to_s, col.to_s]).first
@@ -105,5 +150,87 @@ class Plate < ActiveRecord::Base
     end
     return well.replicate.characterizations.first
   end
+
+  def xlsx_with_plate_layout(sheet_name)
+    w = RubyXL::Workbook.new
+    w.worksheets <<  RubyXL::Worksheet.new(sheet_name)
+
+    # write row names
+    8.times do |row|
+      row_name = ((?A)+row).chr
+      w.worksheets[0].add_cell(row+1, 0, row_name)
+      w.worksheets[0].sheet_data[row+1][0].change_font_bold(true)
+    end
+
+    # write column names
+    12.times do |col|
+      col_name = (col+1).to_s
+      w.worksheets[0].add_cell(0, col+1, col_name)
+      w.worksheets[0].sheet_data[0][col+1].change_font_bold(true)
+    end
+    w
+  end
+
+  def get_xlsx_characterization
+    w = xlsx_with_plate_layout("Characterization")
+
+    # write data
+    wells.each do |well|
+      characterization = well.replicate.characterizations.first
+      w.worksheets[0].add_cell(well.row.to_i, well.column.to_i, characterization.value)
+    end
+
+    out_path = File.join(Rails.root, 'public', "plate_#{id}_characterization.xlsx")
+    w.write(out_path)
+    out_path
+  end
+
+  def get_xlsx_characterization_sd
+    w = xlsx_with_plate_layout("Characterization standard deviation")
+
+    # write data
+    wells.each do |well|
+      characterization = well.replicate.characterizations.first
+      w.worksheets[0].add_cell(well.row.to_i, well.column.to_i, characterization.standard_deviation)
+    end
+
+    out_path = File.join(Rails.root, 'public', "plate_#{id}_characterization_sd.xlsx")
+    w.write(out_path)
+    out_path
+  end
+
+
+  def get_xlsx_performance
+    w = xlsx_with_plate_layout("Performance")
+
+    # write data
+    wells.each do |well|
+      performance = well.replicate.characterizations.first.performances.first
+      w.worksheets[0].add_cell(well.row.to_i, well.column.to_i, performance.value)
+    end
+
+    out_path = File.join(Rails.root, 'public', "plate_#{id}_performance.xlsx")
+    w.write(out_path)
+    out_path
+  end
+
+  def get_xlsx_performance_sd
+    w = xlsx_with_plate_layout("Performance standard deviation")
+
+    # write data
+    wells.each do |well|
+      performance = well.replicate.characterizations.first.performances.first
+#      w.worksheets[0].add_cell(well.row.to_i, well.column.to_i, performance.value)
+
+      w.worksheets[0].add_cell(well.row.to_i, well.column.to_i, performance.standard_deviation)
+      
+    end
+
+    out_path = File.join(Rails.root, 'public', "plate_#{id}_performance_sd.xlsx")
+
+    w.write(out_path)
+    out_path
+  end
+
 
 end

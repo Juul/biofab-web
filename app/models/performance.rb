@@ -5,4 +5,5 @@ class Performance < ActiveRecord::Base
   has_and_belongs_to_many :characterizations
   has_and_belongs_to_many :reliabilities
 
+
 end

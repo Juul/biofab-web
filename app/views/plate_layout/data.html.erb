@@ -13,7 +13,13 @@
 <% else %>
   <ul>
     <% @layout.plates.each do |plate| %>
-      <li><%= link_to plate.name, :controller => 'plate', :action => 'show', :id => plate.id %> - <%= l plate.created_at %></li>
+      <li>
+        <%= link_to plate.name, :controller => 'plate', :action => 'show', :id => plate.id %> - <%= l plate.created_at %> -
+        <%= link_to 'characterization', :controller => 'plate', :action => 'characterization_xlsx', :id => plate.id %> -
+        <%= link_to 'characterization_sd', :controller => 'plate', :action => 'characterization_sd_xlsx', :id => plate.id %> -
+        <%= link_to 'performance', :controller => 'plate', :action => 'performance_xlsx', :id => plate.id %> -
+        <%= link_to 'performance_sd', :controller => 'plate', :action => 'performance_sd_xlsx', :id => plate.id %>
+      </li>
     <% end %>
   </ul>
 <% end %>
@@ -24,7 +30,12 @@
 <% else %>
   <ul>
   <% @dirs.each do |dir| %>
-    <li><%= link_to dir[:name], :action => 'analyze', :id => @layout.id, :dirname => dir[:name] %> - <%= l dir[:created_at] %></li>
+    <li>
+      <%= dir[:name] %> - 
+      <%= link_to 'analyze green', :action => 'analyze', :id => @layout.id, :dirname => dir[:name], :channel => 'green' %> - 
+      <%= link_to 'analyze red', :action => 'analyze', :id => @layout.id, :dirname => dir[:name], :channel => 'red' %> - 
+      <%= l dir[:created_at] %> - 
+    </li>
   <% end %>
   </ul>
 <% end %>

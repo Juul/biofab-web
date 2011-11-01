@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111027141316) do
+ActiveRecord::Schema.define(:version => 20111101073727) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.integer  "resource_id",   :null => false
@@ -84,6 +84,11 @@ ActiveRecord::Schema.define(:version => 20111027141316) do
     t.datetime "updated_at"
     t.float    "value"
     t.float    "standard_deviation"
+  end
+
+  create_table "characterizations_performances", :id => false, :force => true do |t|
+    t.integer "performance_id"
+    t.integer "characterization_id"
   end
 
   create_table "collections", :force => true do |t|
@@ -181,11 +186,6 @@ ActiveRecord::Schema.define(:version => 20111027141316) do
     t.string   "notes"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "performances_characterizations", :id => false, :force => true do |t|
-    t.integer "performance_id"
-    t.integer "characterization_id"
   end
 
   create_table "performances_reliabilities", :id => false, :force => true do |t|

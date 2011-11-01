@@ -2,15 +2,15 @@ Greetings human.
 
 I regret to inform you that your background process has failed.
 
-An exception of class <%= @e.class.to_s %> occurred.
+An exception of class <%=raw @e.class.to_s %> occurred.
 
 The exception message was:
 
-  <%= @e.message %>
+  <%=raw @e.message %>
 
 The backtrace:
 
-<%= @e.backtrace.join("\n") %>
+<%=raw @e.backtrace.join("\n") %>
 
 Have a nice day!
 

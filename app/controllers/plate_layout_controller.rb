@@ -9,7 +9,13 @@ class PlateLayoutController < ApplicationController
 
   def analyze
     plate_layout = PlateLayout.find(params['id'])
-    Plate.delay.analyze(plate_layout, current_user, params['dirname'])
+    if params['channel'] == 'red'
+      fluo_channel = 'RED'
+    elsif params['channel'] == 'green'
+      fluo_channel = 'GRN'
+    end
+
+    Plate.delay.analyze(plate_layout, fluo_channel, current_user, params['dirname'])
 
     flash[:notice] = "The flow cytometer data is being analyzed. You will receive an email at #{current_user.email} when it is complete. When the analysis completes, the new plates will appear under the \"Plates using this layout\" section"
     redirect_to :action => 'data', :id => params['id']

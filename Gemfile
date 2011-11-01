@@ -49,3 +49,7 @@ gem 'delayed_job'
 gem 'pry'
 
 gem 'rsruby'
+
+gem 'zip' # required for rubyXL
+gem 'nokogiri' # required for rubyXL
+gem 'rubyXL'
