@@ -1,6 +1,11 @@
 class PlateLayoutController < ApplicationController
 
   def list
+    if !current_user
+      flash[:notice] = 'Please log in'
+      redirect_to '/login'
+      return
+    end
     @mine = PlateLayout.where(["user_id = ?", current_user.id]).order('created_at desc')
 
    @others = PlateLayout.where(["user_id != ?", current_user.id]).order('created_at desc')
