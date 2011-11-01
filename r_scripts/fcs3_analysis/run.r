@@ -190,6 +190,10 @@ run = function(out_path,
 			if(verbose) {
         cat("Saving fcs files... ")
       }
+      tpath = file.path(path,paste("Cleaned_data",pattern,sep="_"),"Cluster1",basename(folders[i]))
+      cat("============tpath")
+      cat(tpath)
+      cat("\n")
 
 			write.flowSet(flowset, file.path(path,paste("Cleaned_data",pattern,sep="_"),"Cluster1",basename(folders[i])),filename=sampleNames(flowset))
 
