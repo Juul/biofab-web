@@ -3,6 +3,7 @@
 library(flowCore)
 library(flowViz)
 library(flowClust)
+library(RSvgDevice)
 #library(xlsx)
 
 # parameters
