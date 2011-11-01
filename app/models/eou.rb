@@ -9,4 +9,13 @@ class Eou < ActiveRecord::Base
     promoter.sequence + five_prime_utr.sequence + gene.sequence + terminator
   end
 
+  def descriptor
+    descs = []
+    descs << promoter.biofab_id_descriptor
+    descs << five_prime_utr.biofab_id_descriptor
+    descs << cds.biofab_id_descriptor
+    descs << terminator.biofab_id_descriptor
+    descs.join(' | ')
+  end
+
 end

@@ -1,19 +1,34 @@
+<script type='text/javascript'>
+
+  // TODO! waaay too much hardcoding
+
+  function show_plot_for(plate_layout_id, plate_name, row, col) {
+    var base_path = '/flow_cytometer_output/'+plate_layout_id;
+    var filepath = base_path+'/_'+row+col+'_'+plate_name+'_2_processed.png';
+    console.log(filepath);
+    $('plot').src = "";
+    $('plot').alt = 'Loading plot for well '+row+col;
+    $('plot').src = filepath;
+  }
+
+</script>
+
 <div class='flow_cyte_container'>
 
     <h1>Plate data</h1>
 
     <h2>Plate: <%= @plate.name %></h2>
 
-    <table class='plate_layout'>
+    <table class='plate_layout' style='float:left'>
 
       <% 9.times do |row| %>
         <tr id='<%= "row_#{row}" %>' <%= "class='topmost'" if row == 0 %>>
         <% 13.times do |col| %>
-         <td id='<%= "row_#{row}_col_#{col}" %>' class='<%= "topmost" if row == 0 %> <%= "leftmost" if col == 0 %>'>
+         <td id='<%= "row_#{row}_col_#{col}" %>' class='<%= "topmost" if row == 0 %> <%= "leftmost" if col == 0 %>' onmouseover='show_plot_for("<%= @plate.plate_layout.id.to_s %>", "<%= @plate.name %>", "<%= row_to_letter(row) %>", "<%= col_to_twodigit(col) %>")'>
            <% if (row == 0) && (col > 0) %>
              <div class='row_number'><%= col %></div>
            <% elsif (col == 0) && (row > 0) %>
-             <div class='col_number'><%= row_to_letter(row) %></div>            
+             <div class='col_number'><%= row_to_letter(row) %></div>
            <% end %>
 
            <% if (row > 0) && (col > 0) %>
@@ -32,6 +47,9 @@
       <% end %>
 
     </table>
-
+    
+    <div id='plot_container' style='float:left; padding-left:20px'>
+      <img id='plot' />
+    </div>
 
 </div>

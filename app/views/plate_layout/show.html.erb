@@ -47,7 +47,7 @@
       <li>5' UTR: <input name='plate_layout_eou[five_prime_utr]' id='five_prime_utr' placeholder='<variable>' value='<%= @layout.eou.five_prime_utr.descriptor if @layout.eou && @layout.eou.five_prime_utr %>' /></li>
       <li>CDS: <input name='plate_layout_eou[cds]' id='cds' placeholder='<variable>' value='<%= @layout.eou.cds.descriptor if @layout.eou && @layout.eou.cds %>' /></li>
       <li>Terminator: <input name='plate_layout_eou[terminator]' id='terminator' placeholder='<variable>' value='<%= @layout.eou.terminator.descriptor if @layout.eou && @layout.eou.terminator %>' /></li>
-      <li>Hide fields set by master: <input name='plate_layout[hide_global_wells]' id='hide_master' type='checkbox' <%= "checked='checked'" if @layout.hide_global_wells %> /></li>
+      <li>Hide plate-global settings in plate layout: <input name='plate_layout[hide_global_wells]' id='hide_master' type='checkbox' <%= "checked='checked'" if @layout.hide_global_wells %> /></li>
     </ul>
 
     <h3>Plate layout</h3>

@@ -6,6 +6,26 @@ class PlateLayout < ActiveRecord::Base
   has_many :wells, :class_name => 'PlateLayoutWell'
   has_many :plates
 
+  def well_descriptor_at(row, col)
+    cur_organism = nil
+    cur_eou = nil
+    well = wells.where(["row = ? AND column = ?", row, col]).includes(:eou).first
+    if !well # not directly specified
+      well = wells.where(["row = ? AND column = 0", row]).includes(:eou).first
+    end
+    if !well # not specified by row
+      well = wells.where(["row = 0 AND column = ?", col]).includes(:eou).first
+    end
+    if !well # not specified by column
+      cur_organism = organism
+      cur_eou = eou
+    else
+      cur_organism = well.organism
+      cur_eou = well.eou
+    end
+    "#{(cur_organism) ? cur_organism.substrain : 'ORGANISM_NA'} | #{(cur_eou) ? cur_eou.descriptor : 'EOU_NA'}"
+  end
+
   def well_descriptor_for(part_type_name, row, col)
     return '' if !id
     well = wells.where(["row = ? AND column = ?", row, col]).includes(:eou).first

@@ -34,22 +34,22 @@ gem 'unicorn'
 gem 'execjs'
 gem 'therubyracer'
 
-# authentication
-gem 'sorcery'
+gem 'sorcery' # access control
 
-# better forms
-gem 'formtastic'
+gem 'formtastic' # better forms
 
-gem 'rjb'
+gem 'rjb' # ruby java bridge
 
-gem 'thin'
+gem 'thin' # better webserver than webrick
 
-gem 'delayed_job'
+gem 'delayed_job' # queueing 
 
-gem 'pry'
+gem 'pry' # nicer rails console
 
-gem 'rsruby'
+gem 'rsruby' # R interface
 
-gem 'zip' # required for rubyXL
-gem 'nokogiri' # required for rubyXL
-gem 'rubyXL'
+#gem 'zip' # required for rubyXL
+#gem 'nokogiri' # required for rubyXL
+#gem 'rubyXL' # xlsx file output
+
+gem 'spreadsheet' # xls file output

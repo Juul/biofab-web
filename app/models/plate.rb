@@ -151,84 +151,72 @@ class Plate < ActiveRecord::Base
     return well.replicate.characterizations.first
   end
 
-  def xlsx_with_plate_layout(sheet_name)
-    w = RubyXL::Workbook.new
-    w.worksheets <<  RubyXL::Worksheet.new(sheet_name)
+  def xls_add_plate_sheet(workbook, sheet_name)
+    sheet = workbook.create_worksheet
+    sheet.name = sheet_name
+
+    row_name_format = Spreadsheet::Format.new(:weight => :bold)
+    col_name_format = Spreadsheet::Format.new(:weight => :bold)
 
     # write row names
     8.times do |row|
       row_name = ((?A)+row).chr
-      w.worksheets[0].add_cell(row+1, 0, row_name)
-      w.worksheets[0].sheet_data[row+1][0].change_font_bold(true)
+      sheet[row+1, 0] = row_name
+      sheet.row(row+1).set_format(0, row_name_format)
     end
 
     # write column names
     12.times do |col|
       col_name = (col+1).to_s
-      w.worksheets[0].add_cell(0, col+1, col_name)
-      w.worksheets[0].sheet_data[0][col+1].change_font_bold(true)
+      sheet[0, col+1] = col_name
+      sheet.row(0).set_format(col+1, col_name_format)
     end
-    w
+    sheet
   end
 
-  def get_xlsx_characterization
-    w = xlsx_with_plate_layout("Characterization")
+  def xls_add_plate_layout_sheet(workbook)
+    sheet = xls_add_plate_sheet(workbook, 'Plate layout')
+    1.upto(8) do |row|
+      1.upto(12) do |col|
+        sheet[row, col] = plate_layout.well_descriptor_at(row, col)
+      end
+    end
+    sheet
+  end
 
-    # write data
+  def get_characterization_xls
+    workbook = Spreadsheet::Workbook.new
+
+    layout_sheet = xls_add_plate_layout_sheet(workbook)
+    value_sheet = xls_add_plate_sheet(workbook, 'Characterization')
+    sd_sheet = xls_add_plate_sheet(workbook, 'Standard deviation')
+
     wells.each do |well|
       characterization = well.replicate.characterizations.first
-      w.worksheets[0].add_cell(well.row.to_i, well.column.to_i, characterization.value)
+      value_sheet[well.row.to_i, well.column.to_i] = characterization.value
+      sd_sheet[well.row.to_i, well.column.to_i] = characterization.standard_deviatio
     end
 
-    out_path = File.join(Rails.root, 'public', "plate_#{id}_characterization.xlsx")
-    w.write(out_path)
+    out_path = File.join(Rails.root, 'public', "plate_#{id}_characterization.xls")
+    workbook.write(out_path)
     out_path
   end
 
-  def get_xlsx_characterization_sd
-    w = xlsx_with_plate_layout("Characterization standard deviation")
+  def get_performance_xls
+    workbook = Spreadsheet::Workbook.new
 
-    # write data
-    wells.each do |well|
-      characterization = well.replicate.characterizations.first
-      w.worksheets[0].add_cell(well.row.to_i, well.column.to_i, characterization.standard_deviation)
-    end
+    layout_sheet = xls_add_plate_layout_sheet(workbook)
+    value_sheet = xls_add_plate_sheet(workbook, 'Performance')
+    sd_sheet = xls_add_plate_sheet(workbook, 'Standard deviation')
 
-    out_path = File.join(Rails.root, 'public', "plate_#{id}_characterization_sd.xlsx")
-    w.write(out_path)
-    out_path
-  end
-
-
-  def get_xlsx_performance
-    w = xlsx_with_plate_layout("Performance")
-
-    # write data
     wells.each do |well|
       performance = well.replicate.characterizations.first.performances.first
-      w.worksheets[0].add_cell(well.row.to_i, well.column.to_i, performance.value)
+      value_sheet[well.row.to_i, well.column.to_i] = performance.value
+      sd_sheet[well.row.to_i, well.column.to_i] = performance.standard_deviation
     end
 
-    out_path = File.join(Rails.root, 'public', "plate_#{id}_performance.xlsx")
-    w.write(out_path)
-    out_path
-  end
-
-  def get_xlsx_performance_sd
-    w = xlsx_with_plate_layout("Performance standard deviation")
-
-    # write data
-    wells.each do |well|
-      performance = well.replicate.characterizations.first.performances.first
-#      w.worksheets[0].add_cell(well.row.to_i, well.column.to_i, performance.value)
-
-      w.worksheets[0].add_cell(well.row.to_i, well.column.to_i, performance.standard_deviation)
-      
-    end
-
-    out_path = File.join(Rails.root, 'public', "plate_#{id}_performance_sd.xlsx")
-
-    w.write(out_path)
+    out_path = File.join(Rails.root, 'public', "plate_#{id}_performance.xls")
+    workbook.write(out_path)
     out_path
   end
 

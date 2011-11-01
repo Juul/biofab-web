@@ -48,6 +48,10 @@ class Part < ActiveRecord::Base
     self.terminators.all.collect {|part| part.descriptor}
   end
 
+  def biofab_id_descriptor
+    (biofab_id.blank?) ? 'NO_ID' : biofab_id
+  end
+
   def descriptor
     "#{biofab_id}: #{description}"
   end
