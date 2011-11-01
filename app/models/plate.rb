@@ -23,11 +23,11 @@ class Plate < ActiveRecord::Base
         Dir.mkdir(out_path)
       end
 
-      f = File.new(File.join(Rails.root, 'foobar.out'))
-      data = eval(f.readlines.join(''))
-      f.close
+#      f = File.new(File.join(Rails.root, 'foobar.out'))
+#      data = eval(f.readlines.join(''))
+#      f.close
 
-#      data = r.run(out_path, data_path, :fluo => fluo_channel)
+      data = r.run(out_path, data_path, :fluo => fluo_channel)
 
       # TODO remove this debug code
       f = File.new(File.join(Rails.root, 'foobar.out'), 'w+')
