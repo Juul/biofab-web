@@ -6,6 +6,10 @@ class PlateLayout < ActiveRecord::Base
   has_many :wells, :class_name => 'PlateLayoutWell'
   has_many :plates
 
+  def well_at(row, col)
+    wells.where(["row = ? AND column = ?", row, col]).includes(:eou).first
+  end
+
   def well_descriptor_at(row, col)
     cur_organism = nil
     cur_eou = nil

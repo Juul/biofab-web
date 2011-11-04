@@ -1,0 +1,11 @@
+hostname: localhost
+port: 3000
+protocol: https
+url_prefix: false
+
+# for biofab google docs import scripts only
+# most developers won't need this
+google_username: false
+google_password: false
+google_docs_key: false
+

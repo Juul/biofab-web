@@ -1,46 +1,59 @@
 #!script/rails runner
 
-f = File.new('/home/juul/biofab/data/google_docs/parts.csv')
+g = Google.new(Settings['google_docs_key'], Settings['google_username'], Settings['google_password'])
 
-first = true
-lines = f.readlines
-lines.each do |line|
-  if first
-    first = false
+g.default_sheet = 'PARTS'
+
+row = 2
+while(!g.cell(row, 1).blank?)
+  biofab_id = "apFAB#{g.cell(row, 1).to_i}"
+
+  type = g.cell(row, 2)
+  if type.blank?
+    row += 1
     next
   end
+   
+  description = g.cell(row, 3)
+  sequence = g.cell(row, 4)
 
-
-  id, type, desc, seq = line.gsub("\n", '').split(",")
-
-  biofab_id = "apFAB#{id}"
-
+  if sequence
+    sequence = sequence.upcase.gsub(/[^GATC]+/, '')
+  end
+  
   type_query = '%' + type.gsub(/[^\w\d]+/, '%') + '%'
-
-  part_type = PartType.where("name like '#{type_query}'")
-  if part_type.length != 1
+  part_type = PartType.where("name like '#{type_query}'").first
+  if !part_type
     puts "Failed for #{biofab_id} to find part type based on: #{type}"
     exit
   end
 
-  part_type = part_type[0]
+  if Part.where(["biofab_id = ?", biofab_id]).first
+    puts "Skipped #{biofab_id}: Already in the database."
+    row +=1
+    next
+  end
+
+  old_part = Part.where(["sequence = ?", sequence]).first
+  if old_part
+    puts "Skipped #{biofab_id}: Same sequence as #{old_part.biofab_id}"
+    row +=1
+    next
+  end
 
   part = Part.new
-  
   part.biofab_id = biofab_id
-  part.sequence = seq
-  part.description = desc
+  part.sequence = sequence
+  part.description = description
   part.part_type = part_type
-
+  
   begin
     part.save!
-    puts "Succeeded for #{biofab_id}"
+    puts "Imported #{biofab_id}"
   rescue Exception => e
-     puts "Failed for part #{biofab_id}: #{e.message}"
-     exit
+    puts "Failed to import #{biofab_id}: #{e.message}"
   end
+
+  row += 1
 end
-
-
-
 

@@ -48,8 +48,7 @@ gem 'pry' # nicer rails console
 
 gem 'rsruby' # R interface
 
-#gem 'zip' # required for rubyXL
-#gem 'nokogiri' # required for rubyXL
-#gem 'rubyXL' # xlsx file output
-
 gem 'spreadsheet' # xls file output
+
+gem 'zip' # required by roo
+gem 'roo' # google docs import

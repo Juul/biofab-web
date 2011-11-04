@@ -8,7 +8,7 @@ class PlateLayoutController < ApplicationController
     end
     @mine = PlateLayout.where(["user_id = ?", current_user.id]).order('created_at desc')
 
-   @others = PlateLayout.where(["user_id != ?", current_user.id]).order('created_at desc')
+   @others = PlateLayout.where(["user_id != ? or user_id IS NULL", current_user.id]).order('created_at desc')
 
   end
 

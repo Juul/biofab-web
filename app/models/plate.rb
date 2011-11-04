@@ -23,11 +23,12 @@ class Plate < ActiveRecord::Base
         Dir.mkdir(out_path)
       end
 
-#      f = File.new(File.join(Rails.root, 'foobar.out'))
-#      data = eval(f.readlines.join(''))
-#      f.close
+      f = File.new(File.join(Rails.root, 'foobar.out'))
+      data = eval(f.readlines.join(''))
+      f.close
 
-      data = r.run(out_path, data_path, :fluo => fluo_channel)
+      # TODO remove hard-coded "rectangle" gating
+#      data = r.run(out_path, data_path, :fluo => fluo_channel, :clust_gating => "rectangle")
 
       # TODO remove this debug code
       f = File.new(File.join(Rails.root, 'foobar.out'), 'w+')
@@ -194,7 +195,7 @@ class Plate < ActiveRecord::Base
     wells.each do |well|
       characterization = well.replicate.characterizations.first
       value_sheet[well.row.to_i, well.column.to_i] = characterization.value
-      sd_sheet[well.row.to_i, well.column.to_i] = characterization.standard_deviatio
+      sd_sheet[well.row.to_i, well.column.to_i] = characterization.standard_deviation
     end
 
     out_path = File.join(Rails.root, 'public', "plate_#{id}_characterization.xls")
