@@ -18,11 +18,14 @@ end
 def usage
   puts "This script imports plate layouts from xlsx files."
   puts "Usage: "
-  puts "  #{__FILE__} <excel_sheet.xlsx>"
+  puts "  #{__FILE__} <excel_sheet.xlsx> <sheet_name>"
+  puts " "
+  puts "  Reminder: Put quotes around sheet_name if it contains spaces."
+  puts " "
 end
 
 
-if ARGV.length != 1
+if ARGV.length != 2
   usage()
   exit
 end
@@ -30,7 +33,7 @@ end
 filepath = ARGV[0]
 
 x = Excelx.new(filepath)
-x.default_sheet = 'BD-GOII Schoner'
+x.default_sheet = ARGV[1]
 
 organism = nil # variable
 
