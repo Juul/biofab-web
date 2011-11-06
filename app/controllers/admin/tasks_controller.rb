@@ -3,7 +3,11 @@ class Admin::TasksController < ApplicationController
   # TODO should only be available to admins
 
   def index
-    
+    render :text => "index"
+  end
+
+  def foo
+    @id = 3
   end
 
   def delay

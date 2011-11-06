@@ -1,10 +1,10 @@
 class ProcessMailer < ActionMailer::Base
-  # TODO create a settings.yml for this
-  default :from => "mjchristoffersen@lbl.gov"
+
+  default :from => Settings['admin_email']
 
   def flowcyte_completed(user, id)
     # TODO settings.yml
-    @url = "http://localhost:3000/plate_layout/data/#{id}"
+    @id = id
 
     if system("which fortune > /dev/null")
       @fortune = `fortune`

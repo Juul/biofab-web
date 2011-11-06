@@ -1,7 +1,9 @@
 hostname: localhost
 port: 3000
-protocol: https
-url_prefix: false
+protocol: http # or https
+url_prefix: false # e.g. /my_app
+
+admin_email: someone@example.com
 
 # for biofab google docs import scripts only
 # most developers won't need this
