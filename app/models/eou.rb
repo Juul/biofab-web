@@ -9,12 +9,19 @@ class Eou < ActiveRecord::Base
     promoter.sequence + five_prime_utr.sequence + gene.sequence + terminator
   end
 
-  def descriptor
+  def parts
+    [promoter, five_prime_utr, cds, terminator]
+  end
+
+  def descriptor(opts={})
     descs = []
-    descs << promoter.biofab_id_descriptor
-    descs << five_prime_utr.biofab_id_descriptor
-    descs << cds.biofab_id_descriptor
-    descs << terminator.biofab_id_descriptor
+    parts.each do |part|
+      if part
+        descs << part.biofab_id_descriptor
+      else
+        descs << 'NA' unless opts[:hide_NA]
+      end
+    end
     descs.join(' | ')
   end
 

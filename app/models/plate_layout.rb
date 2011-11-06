@@ -10,7 +10,15 @@ class PlateLayout < ActiveRecord::Base
     wells.where(["row = ? AND column = ?", row, col]).includes(:eou).first
   end
 
-  def well_descriptor_at(row, col)
+  def brief_well_descriptor_at(row, col, opts={})
+    well = wells.where(["row = ? AND column = ?", row, col]).includes(:eou).first
+    return 'NA' if !well
+    desc = ''
+    desc += "#{well.organism.brief_descriptor} | " if well.organism
+    desc += well.eou.descriptor(opts) if well.eou
+  end
+
+  def well_descriptor_at(row, col, opts={})
     cur_organism = nil
     cur_eou = nil
     well = wells.where(["row = ? AND column = ?", row, col]).includes(:eou).first
@@ -27,7 +35,7 @@ class PlateLayout < ActiveRecord::Base
       cur_organism = well.organism
       cur_eou = well.eou
     end
-    "#{(cur_organism) ? cur_organism.substrain : 'ORGANISM_NA'} | #{(cur_eou) ? cur_eou.descriptor : 'EOU_NA'}"
+    "#{(cur_organism) ? cur_organism.brief_descriptor : 'ORGANISM_NA'} | #{(cur_eou) ? cur_eou.descriptor(opts) : 'EOU_NA'}"
   end
 
   def well_descriptor_for(part_type_name, row, col)

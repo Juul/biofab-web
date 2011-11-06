@@ -152,7 +152,7 @@ class Plate < ActiveRecord::Base
     return well.replicate.characterizations.first
   end
 
-  def xls_add_plate_sheet(workbook, sheet_name)
+  def xls_add_plate_sheet(workbook, sheet_name, y_offset=0, x_offset=0)
     sheet = workbook.create_worksheet
     sheet.name = sheet_name
 
@@ -162,25 +162,37 @@ class Plate < ActiveRecord::Base
     # write row names
     8.times do |row|
       row_name = ((?A)+row).chr
-      sheet[row+1, 0] = row_name
-      sheet.row(row+1).set_format(0, row_name_format)
+      sheet[y_offset+row+1, x_offset] = row_name
+      sheet.row(y_offset+row+1).set_format(x_offset, row_name_format)
     end
 
     # write column names
     12.times do |col|
       col_name = (col+1).to_s
-      sheet[0, col+1] = col_name
-      sheet.row(0).set_format(col+1, col_name_format)
+      sheet[y_offset, x_offset+col+1] = col_name
+      sheet.row(y_offset).set_format(x_offset+col+1, col_name_format)
     end
     sheet
   end
 
   def xls_add_plate_layout_sheet(workbook)
-    sheet = xls_add_plate_sheet(workbook, 'Plate layout')
+    sheet = xls_add_plate_sheet(workbook, 'Plate layout', 1, 1)
     1.upto(8) do |row|
+      sheet[row+1, 0] = plate_layout.well_descriptor_at(row, 0)
       1.upto(12) do |col|
-        sheet[row, col] = plate_layout.well_descriptor_at(row, col)
+        if row == 1
+          sheet[0, col] = plate_layout.well_descriptor_at(0, col)
+        end
+        sheet[row+1, col+1] = plate_layout.brief_well_descriptor_at(row, col, :hide_NA => true)
       end
+    end
+    if plate_layout.organism
+      sheet[12, 1] = "Plate-global organism:"
+      sheet[12, 3] = plate_layout.organism.descriptor
+    end
+    if plate_layout.eou
+      sheet[14, 1] = "Plate-global EOU:"
+      sheet[14, 3] = plate_layout.eou.descriptor
     end
     sheet
   end
