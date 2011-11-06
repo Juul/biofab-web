@@ -1,5 +1,8 @@
 class ProcessMailer < ActionMailer::Base
 
+  # Make helpers available for views
+  add_template_helper(ApplicationHelper)
+
   default :from => Settings['admin_email']
 
   def flowcyte_completed(user, id)

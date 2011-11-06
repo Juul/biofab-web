@@ -6,6 +6,11 @@ class Admin::TasksController < ApplicationController
     render :text => "index"
   end
 
+  def bar
+      ProcessMailer.flowcyte_completed(User.first, PlateLayout.first).deliver
+    render :text => 'delivered'
+  end
+
   def foo
     @id = 3
   end

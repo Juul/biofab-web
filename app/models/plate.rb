@@ -28,7 +28,7 @@ class Plate < ActiveRecord::Base
 #      f.close
 
       # TODO remove hard-coded "rectangle" gating
-      data = r.run(out_path, data_path, :fluo => fluo_channel, :clust_gating => "rectangle")
+      data = r.run(out_path, data_path, :fluo => fluo_channel, :init_gate => "rectangle")
 
       # TODO remove this debug code
       f = File.new(File.join(Rails.root, 'foobar.out'), 'w+')
