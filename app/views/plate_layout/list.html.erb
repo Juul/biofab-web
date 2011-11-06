@@ -8,7 +8,12 @@
   <ul>
     <% @mine.each do |layout| %>
       <li>
-        <%= l layout.created_at, :format => :full %> - <%= link_to layout.name, :action => 'show', :id => layout.id %>
+        <%= l layout.created_at, :format => :full %> - 
+        <% if Plate.where(["plate_layout_id = ?", layout.id]).first %>
+          <%= link_to "#{layout.name} (has data)", :action => 'data', :id => layout.id %>
+        <% else %>
+          <%= link_to layout.name, :action => 'show', :id => layout.id %>
+        <% end %>
       </li>
     <% end %>
   </ul>
@@ -17,7 +22,7 @@
 <%= link_to 'New layout', :action => 'show' %>
 
 
-<h3>Others' layouts</h3>
+<h3>Other layouts</h3>
 
 <% if @others.empty? %>
   <p>No-one else has any layouts.</p>
@@ -25,7 +30,12 @@
   <ul>
     <% @others.each do |layout| %>
       <li>
-        <%= l layout.created_at, :format => :full %> - <%= link_to layout.name, :action => 'show', :id => layout.id %>
+        <%= l layout.created_at, :format => :full %> - 
+        <% if Plate.where(["plate_layout_id = ?", layout.id]).first %>
+          <%= link_to "#{layout.name} (has data)", :action => 'data', :id => layout.id %>
+        <% else %>
+          <%= link_to layout.name, :action => 'show', :id => layout.id %>
+        <% end %>
       </li>
     <% end %>
   </ul>
