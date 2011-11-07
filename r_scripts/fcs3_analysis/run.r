@@ -128,6 +128,11 @@ run = function(out_path,
 
 		flowset=read.flowSet(path=folders[i], pattern=".fcs", phenodata=pheno)
 
+    # skip this replicate if no flow sets
+    if(length(flowset) == 0) {
+      next
+    }
+
 		if(clean==TRUE) {
 
 			if(verbose) {

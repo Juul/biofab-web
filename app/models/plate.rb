@@ -2,6 +2,21 @@ class Plate < ActiveRecord::Base
   has_many :wells, :class_name => 'PlateWell'
   belongs_to :plate_layout
 
+  def self.foo()
+    # TODO move path to settings.rb
+    input_path = File.join(Rails.root, 'public', 'flow_cytometer_input_data')
+    script_dir = File.join(Rails.root, 'r_scripts', 'fcs3_analysis')
+
+    # Initialize R and load the r source file
+    r = RSRuby.instance
+    r.setwd(script_dir)
+    r.source(File.join(script_dir, 'foo.r'))
+    
+    data = r.foo()
+    data
+  end
+
+
   def self.analyze(plate_layout, fluo_channel, user, dirname)
     begin
 
@@ -30,7 +45,10 @@ class Plate < ActiveRecord::Base
       # TODO remove hard-coded "rectangle" gating
       data = r.run(out_path, data_path, :fluo => fluo_channel, :init_gate => "rectangle")
 
-      # TODO why is this needed (ask Guillaume)
+      if !data
+        raise "No data returned from analysis"
+      end
+
       if fluo_channel == 'RED'
         fluo_channel = 'RED2'
       end
@@ -52,6 +70,10 @@ class Plate < ActiveRecord::Base
       end
 
       plate_names.each do |plate_name|
+        if !data[plate_name]
+          next
+        end
+
         plate = Plate.new
         plate.name = plate_name
         plate.plate_layout = plate_layout
