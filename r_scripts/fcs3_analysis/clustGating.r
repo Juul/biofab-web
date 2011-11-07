@@ -23,36 +23,39 @@ clustGating = function(flowset,
 	{
 		# Refine forward and side scatter gating
 		clust.cell   = flowClust(flowset[[i]], varNames=c("FSC-HLog", "SSC-HLog"), K=1, level=levels[1])
+
+    # TODO check if _any_ clusters were found, 
+    #      and somewhere before this function, make sure 
+    #      ensure that the flowset actually has measurements 
+    #     (length(flowset) >0) and (flowset[[i]$exprs > 10) for each.
+
 		flowset[[i]] = Subset(flowset[[i]], clust.cell)
+
 		# Then on the channel, choosing the best of 1 or 2 cluster(s)
 		# based on the Integrated Completed Likelihood measure
 		# retain the most abundant pop as the good one and status the other
-		if (fluo=="")
+
+		if (fluo=="") {
 			fluos = get.fluo(mapping[i,"fluo"], scale)
-		if (length(fluos)!=0 & nrow(flowset[[i]]@exprs)>10){
+    }
+
+    # Check if there are more than 10 measurements left after gating for forward and side scatter
+		if(length(fluos)!=0 & nrow(flowset[[i]]@exprs)>10) {
+
 			clust.fluo = flowClust(flowset[[i]], varNames=fluos, K=1:2, level=levels[2], criterion="ICL", nu=4, nu.est=0, trans=0, randomStart=25)
 			clust.fluo = refine.selection(clust.fluo)
 			noclust[i] = clust.fluo[[clust.fluo@index]]@K
-			#print(flowset[[i]]@description$description)
-			#for (j in 1:2)
-			#{
-			#	cat("##### ",j, "#####\n")
-			#	print(summary(clust.fluo[[j]]))
-			#}
+
 			if (noclust[i] == 1)
 			{
-	# 			if (output!=FALSE)
-	# 			{
-	# 				png(file.path(output[1],paste(flowset[[i]]@description$`$WELLID`,"_",output[2],"_1_cluster.png",sep="")))
-	# 				hist(clust.fluo[[clust.fluo@index]],flowset[[i]], main=paste(flowset[[i]]@description$description," (",flowset[[i]]@description$`$WELLID`,")\n",output[2],sep=""),xlim=c(0,4))
-	# 				dev.off()
-	# 			}
+
 				flowset[[i]]=Subset(flowset[[i]], clust.fluo)
 				if (nrow(flowset[[i]]>2))
 					flowset[[i]]@description$"sw.p.value"=shapiro.test(flowset[[i]]@exprs[,fluos[1]])$p.value
 				if (output!=FALSE)
 				{
 					png(file.path(output[1],paste(flowset[[i]]@description$description, "_",flowset[[i]]@description$`$WELLID`,"_",output[2],"_2_processed.png",sep="")))
+
 					# Draw histogram, density plot and normal fit
 					breaks=nrow(flowset[[i]])/5
 					h=hist(flowset[[i]]@exprs[,fluos[1]],breaks=breaks, plot=FALSE)
