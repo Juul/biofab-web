@@ -14,7 +14,7 @@
   <ul>
     <% @layout.plates.each do |plate| %>
       <li>
-        <%= link_to plate.name, :controller => 'plate', :action => 'show', :id => plate.id %> - <%= l plate.created_at %> -
+        <%= link_to "#{plate.name} - #{plate.description}", :controller => 'plate', :action => 'show', :id => plate.id %> - <%= l plate.created_at %> -
         <%= link_to 'characterization', :controller => 'plate', :action => 'characterization_xls', :id => plate.id %> -
         <%= link_to 'performance', :controller => 'plate', :action => 'performance_xls', :id => plate.id %>
       </li>

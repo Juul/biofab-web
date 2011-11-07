@@ -80,7 +80,9 @@ class Plate < ActiveRecord::Base
 
           plate.wells << well
         end
-        
+
+        plate.description = fluo_channel
+
         plate.save!
       end
 
