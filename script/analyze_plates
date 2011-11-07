@@ -1,9 +1,9 @@
 #!script/rails runner
 
 
-#names = [/BD.*M1$/, /BD.*M2$/, /BD.*M3$/, /BD.*M4$/, /BD.*M7$/, /BD.*M8$/, /BD.*M9$/, /BD.*M10$/, /BD.*S1$/, /BD.*S2$/, /BD.*S3$/, /BD.*S4$/, /BD.*S7$/, /BD.*S8$/, /BD.*S9$/, /BD.*S10$/]
+names = [/^BD.*M1$/, /^BD.*M2$/, /^BD.*M3$/, /^BD.*M4$/, /^BD.*M7$/, /^BD.*M8$/, /^BD.*M9$/, /^BD.*M10$/, /^BD.*S1$/, /^BD.*S2$/, /^BD.*S3$/, /^BD.*S4$/, /^BD.*S7$/, /^BD.*S8$/, /^BD.*S9$/, /^BD.*S10$/]
 
-names = [/BD.*M1$/, /BD.*S1$/, /BD.*S2$/, /BD.*S3$/, /BD.*S4$/, /BD.*S7$/, /BD.*S8$/, /BD.*S9$/, /BD.*S10$/]
+#names = [/^BD.*M1$/, /^BD.*S1$/, /^BD.*S2$/, /^BD.*S3$/, /^BD.*S4$/, /^BD.*S7$/, /^BD.*S8$/, /^BD.*S9$/, /^BD.*S10$/]
 
 
 def find_layout(layouts, regex)
