@@ -30,6 +30,11 @@ class Plate < ActiveRecord::Base
       # TODO remove hard-coded "rectangle" gating
       data = r.run(out_path, data_path, :fluo => fluo_channel, :init_gate => "rectangle")
 
+      # TODO why is this needed (ask Guillaume)
+      if fluo_channel == 'RED'
+        fluo_channel = 'RED2'
+      end
+
       # TODO remove this debug code
       f = File.new(File.join(Rails.root, 'foobar.out'), 'w+')
       f.puts(data.inspect)
@@ -54,11 +59,11 @@ class Plate < ActiveRecord::Base
         # the raw data for the plate
         plate_data = data[plate_name]
 
-        plate_data['mean.GRN.HLin'].each_index do |i|
+        plate_data["mean.#{fluo_channel}.HLin"].each_index do |i|
           break if i > 95 # don't accept more than 96 wells
 
-          mean = plate_data['mean.GRN.HLin'][i]
-          sd = plate_data['sd.GRN.HLin'][i]
+          mean = plate_data["mean.#{fluo_channel}.HLin"][i]
+          sd = plate_data["sd.#{fluo_channel}.HLin"][i]
 
           col = (i % 12)
           row = (i / 12)
@@ -100,8 +105,8 @@ class Plate < ActiveRecord::Base
             perf.characterizations << char
           end
           i = row * 12 + col
-          perf.value = summary_data['mean.mean.GRN.HLin'][i]
-          perf.standard_deviation = summary_data['sd.mean.GRN.HLin'][i]
+          perf.value = summary_data["mean.mean.#{fluo_channel}.HLin"][i]
+          perf.standard_deviation = summary_data["sd.mean.#{fluo_channel}.HLin"][i]
           perf.save!
         end
       end
