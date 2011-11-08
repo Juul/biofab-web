@@ -25,8 +25,6 @@ clustGating = function(flowset,
 		# Refine forward and side scatter gating
 		clust.cell   = flowClust(flowset[[i]], varNames=c("FSC-HLog", "SSC-HLog"), K=1, level=levels[1])
 
-    cat("Length of exprs: ", length(flowset[[i]]@exprs), "\n")
-
 
     # TODO check if _any_ clusters were found, 
     #      and somewhere before this function, make sure 
@@ -49,6 +47,9 @@ clustGating = function(flowset,
 			clust.fluo = flowClust(flowset[[i]], varNames=fluos, K=1:2, level=levels[2], criterion="ICL", nu=4, nu.est=0, trans=0, randomStart=25)
 			clust.fluo = refine.selection(clust.fluo)
 			noclust[i] = clust.fluo[[clust.fluo@index]]@K
+
+
+      cat("Length of exprs: ", length(flowset[[i]]@exprs), "\n")
 
 			if (noclust[i] == 1)
 			{
