@@ -42,7 +42,7 @@ clustGating = function(flowset,
     }
 
     # Check if there are more than 10 measurements left after gating for forward and side scatter
-		if(length(fluos)!=0 & nrow(flowset[[i]]@exprs)>10) {
+    if(length(fluos)!=0 & nrow(flowset[[i]]@exprs)>10) {
 
 			clust.fluo = flowClust(flowset[[i]], varNames=fluos, K=1:2, level=levels[2], criterion="ICL", nu=4, nu.est=0, trans=0, randomStart=25)
 			clust.fluo = refine.selection(clust.fluo)
@@ -55,6 +55,8 @@ clustGating = function(flowset,
 			{
 
 				flowset[[i]]=Subset(flowset[[i]], clust.fluo)
+        cat("Length of exprs post gating: ", length(flowset[[i]]@exprs), "\n")
+
 				if (nrow(flowset[[i]]>2))
 					flowset[[i]]@description$"sw.p.value"=shapiro.test(flowset[[i]]@exprs[,fluos[1]])$p.value
 				if (output!=FALSE)
