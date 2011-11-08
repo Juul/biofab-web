@@ -132,6 +132,7 @@ clustGating = function(flowset,
             cat("mean: ", mean[[rank]], "\n")
 						sd[[rank]]   = sd(subpop[[rank]]@exprs[,fluos[1]])
             cat("sd: ", sd[[rank]], "\n")
+            cat("sd of: ", subpop[[rank]]@exprs[,fluos[1]], "\n")
 						xfit[[rank]] = seq(x.lim[1],x.lim[2],length=100)
             cat("xfit[[rank]] seq: ", xfit[[rank]], "\n")
 						yfit[[rank]] = dnorm(xfit[[rank]],mean=mean[[rank]],sd=sd[[rank]])
