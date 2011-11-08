@@ -22,6 +22,11 @@ clustGating = function(flowset,
 	for (i in 1:length(flowset))
 	{
 
+    # skip if less than 10 measurements
+    if(nrow(flowset[[i]]@exprs) <= 10) {
+      next
+    }
+
 		# Refine forward and side scatter gating
 		clust.cell   = flowClust(flowset[[i]], varNames=c("FSC-HLog", "SSC-HLog"), K=1, level=levels[1])
 
@@ -32,7 +37,11 @@ clustGating = function(flowset,
     #     (length(flowset) >0) and (flowset[[i]$exprs > 10) for each.
 
 		flowset[[i]] = Subset(flowset[[i]], clust.cell)
-    cat("Length of subset: ", length(flowset[[i]]), "\n")
+
+    # skip if less than 10 measurements
+    if(nrow(flowset[[i]]@exprs) <= 10) {
+      next
+    }
 
 		# Then on the channel, choosing the best of 1 or 2 cluster(s)
 		# based on the Integrated Completed Likelihood measure
@@ -56,6 +65,11 @@ clustGating = function(flowset,
 			{
 
 				flowset[[i]]=Subset(flowset[[i]], clust.fluo)
+
+        # skip if less than 10 measurements
+        if(nrow(flowset[[i]]@exprs) <= 10) {
+          next
+        }
 
 				if (nrow(flowset[[i]]>2))
 					flowset[[i]]@description$"sw.p.value"=shapiro.test(flowset[[i]]@exprs[,fluos[1]])$p.value
@@ -95,6 +109,16 @@ clustGating = function(flowset,
 				subpop=split(flowset[[i]], clust.fluo) 
         cat("Length of subpop 1: ", length(subpop[[1]]@exprs), "\n")
         cat("Length of subpop 2: ", length(subpop[[2]]@exprs), "\n")
+
+				flowset[[i]]=Subset(flowset[[i]], clust.fluo)
+
+        # skip if less than 10 measurements
+        if(nrow(subpop[[1]]@exprs) <= 10) {
+          next
+        }
+        if(nrow(subpop[[2]]@exprs) <= 10) {
+          next
+        }
 
 				sorted=sort(matrix(c(mean(subpop[[1]]@exprs[,fluos[1]], na.rm=TRUE),mean(subpop[[2]]@exprs[,fluos[1]], na.rm=TRUE))), index.return=TRUE, decreasing=TRUE)
 
