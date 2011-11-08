@@ -32,6 +32,7 @@ clustGating = function(flowset,
     #     (length(flowset) >0) and (flowset[[i]$exprs > 10) for each.
 
 		flowset[[i]] = Subset(flowset[[i]], clust.cell)
+    cat("Length of subset: ", length(flowset[[i]]), "\n")
 
 		# Then on the channel, choosing the best of 1 or 2 cluster(s)
 		# based on the Integrated Completed Likelihood measure
@@ -55,7 +56,6 @@ clustGating = function(flowset,
 			{
 
 				flowset[[i]]=Subset(flowset[[i]], clust.fluo)
-        cat("Length of exprs post gating: ", length(flowset[[i]]@exprs), "\n")
 
 				if (nrow(flowset[[i]]>2))
 					flowset[[i]]@description$"sw.p.value"=shapiro.test(flowset[[i]]@exprs[,fluos[1]])$p.value
@@ -92,9 +92,12 @@ clustGating = function(flowset,
 			}
 			else if (noclust[i] == 2)
 			{
-				subpop=split(flowset[[i]], clust.fluo)
-				#sorted=sort(matrix(c(nrow(subpop[[1]]),nrow(subpop[[2]]))), index.return=TRUE, decreasing=TRUE)
+				subpop=split(flowset[[i]], clust.fluo) 
+        cat("Length of subpop 1: ", length(subpop[[1]]@exprs), "\n")
+        cat("Length of subpop 2: ", length(subpop[[2]]@exprs), "\n")
+
 				sorted=sort(matrix(c(mean(subpop[[1]]@exprs[,fluos[1]], na.rm=TRUE),mean(subpop[[2]]@exprs[,fluos[1]], na.rm=TRUE))), index.return=TRUE, decreasing=TRUE)
+
 				if (output!=FALSE)
 				{
 					## Draw histogram, density plot and normal curve
