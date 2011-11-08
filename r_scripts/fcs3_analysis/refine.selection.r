@@ -14,6 +14,14 @@ refine.selection = function(flowclustlist, verbose=FALSE) {
     return(flowclustlist)  
   }
 
+  if(is.na(flowclustlist[[1]]@ICL)) {
+    return(flowclustlist)
+  }
+
+  if(is.na(flowclustlist[[2]]@ICL)) {
+    return(flowclustlist)
+  }
+
   # TODO shouldn't the clustering already have selected the cluster with the best ICL? event if both are negative?
   # ICL have preceedence
   if(flowclustlist[[2]]@ICL / flowclustlist[[1]]@ICL < 1) {
