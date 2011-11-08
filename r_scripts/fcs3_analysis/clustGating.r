@@ -59,7 +59,7 @@ clustGating = function(flowset,
 			noclust[i] = clust.fluo[[clust.fluo@index]]@K
 
 
-      cat("Length of exprs: ", length(flowset[[i]]@exprs), "\n")
+      cat("Length of exprs: ", nrow(flowset[[i]]@exprs), "\n")
 
 			if (noclust[i] == 1)
 			{
@@ -107,8 +107,8 @@ clustGating = function(flowset,
 			else if (noclust[i] == 2)
 			{
 				subpop=split(flowset[[i]], clust.fluo) 
-        cat("Length of subpop 1: ", length(subpop[[1]]@exprs), "\n")
-        cat("Length of subpop 2: ", length(subpop[[2]]@exprs), "\n")
+        cat("Length of subpop 1: ", nrow(subpop[[1]]@exprs), "\n")
+        cat("Length of subpop 2: ", nrow(subpop[[2]]@exprs), "\n")
 
 				flowset[[i]]=Subset(flowset[[i]], clust.fluo)
 
