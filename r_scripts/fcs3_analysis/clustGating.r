@@ -131,7 +131,6 @@ clustGating = function(flowset,
 					for (rank in sorted$ix) {
 
             cat("==== ymax: ", ymax, "\n")
-            cat("==== yfit: ", yfit, "\n")
 
 						plot(subh[[rank]], main=paste(flowset[[i]]@description$description," (",flowset[[i]]@description$`$WELLID`,")\n ",output[2],sep=""), xlab=fluos[1], ylab="Counts", 						     border=FALSE, col=paste(colors[index],"50",sep=""), xlim=c(0,4), ylim=c(-0.5,ymax), add=add)
 						polygon(c(subdmatrix[[rank]][1,1], subdmatrix[[rank]][,1], subdmatrix[[rank]][nrow(subdmatrix[[rank]]),1]),
