@@ -109,6 +109,7 @@ clustGating = function(flowset,
 					xfit = vector("list", length=2)
 					yfit = vector("list", length=2)
 					png(file.path(output[1],paste(flowset[[i]]@description$description, "_",flowset[[i]]@description$`$WELLID`,"_",output[2],"_2_processed.png",sep="")))
+
 					for (rank in sorted$ix) {
 						r = range(subpop[[rank]]@exprs[,fluos[1]])
 						subhmatrix  = hmatrix[(hmatrix[,1]>(r[1]-disth) & hmatrix[,1]<r[2]+disth),]
@@ -122,12 +123,16 @@ clustGating = function(flowset,
 						yfit[[rank]] = dnorm(xfit[[rank]],mean=mean[[rank]],sd=sd[[rank]])
 						yfit[[rank]] = yfit[[rank]]*diff(subhmatrix[,4][1:2])*length(subpop[[rank]]@exprs[,fluos[1]])
 						ymax = max(c(yfit[[rank]], subhmatrix[,2], ymax))
+            cat("---------Running for rank--------\n")
 					}
+
 					add    = FALSE
 					index  = 1
 					for (rank in sorted$ix) {
 
             cat("==== ymax: ", ymax, "\n")
+            cat("==== yfit: ", yfit, "\n")
+
 						plot(subh[[rank]], main=paste(flowset[[i]]@description$description," (",flowset[[i]]@description$`$WELLID`,")\n ",output[2],sep=""), xlab=fluos[1], ylab="Counts", 						     border=FALSE, col=paste(colors[index],"50",sep=""), xlim=c(0,4), ylim=c(-0.5,ymax), add=add)
 						polygon(c(subdmatrix[[rank]][1,1], subdmatrix[[rank]][,1], subdmatrix[[rank]][nrow(subdmatrix[[rank]]),1]),
 						        c(0, (subdmatrix[[rank]][,2]*adjust), 0), col=paste(colors[index],"50",sep=""), border=colors[index], lty=3)
