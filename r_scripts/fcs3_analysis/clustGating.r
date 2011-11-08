@@ -21,6 +21,8 @@ clustGating = function(flowset,
 	x.lim = c(0,4)
 	for (i in 1:length(flowset))
 	{
+    cat("Length of exprs: ", length(flowset[[i]]@exprs), "\n")
+
 		# Refine forward and side scatter gating
 		clust.cell   = flowClust(flowset[[i]], varNames=c("FSC-HLog", "SSC-HLog"), K=1, level=levels[1])
 
@@ -121,7 +123,9 @@ clustGating = function(flowset,
 						sd[[rank]]   = sd(subpop[[rank]]@exprs[,fluos[1]])
 						xfit[[rank]] = seq(x.lim[1],x.lim[2],length=100)
 						yfit[[rank]] = dnorm(xfit[[rank]],mean=mean[[rank]],sd=sd[[rank]])
+            cat("yfit[[rank]] dnorm: ", yfit[[rank]], "\n")
 						yfit[[rank]] = yfit[[rank]]*diff(subhmatrix[,4][1:2])*length(subpop[[rank]]@exprs[,fluos[1]])
+            cat("yfit[[rank]] diff: ", yfit[[rank]], "\n")
 						ymax = max(c(yfit[[rank]], subhmatrix[,2], ymax))
             cat("yfit[[rank]]: ", yfit[[rank]], "\n")
             cat("subhmatrix[,2]: ", subhmatrix[,2], "\n")
