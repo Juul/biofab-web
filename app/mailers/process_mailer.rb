@@ -20,8 +20,9 @@ class ProcessMailer < ActionMailer::Base
 
   end
 
-  def error(user, exception)
+  def error(user, exception, extra=nil)
     @e = exception
+    @extra = extra
     mail(:to => user.email, 
          :subject => "[FabIO] An error occurred")
   end

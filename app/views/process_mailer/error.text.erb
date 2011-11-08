@@ -8,6 +8,12 @@ The exception message was:
 
   <%=raw @e.message %>
 
+<% if @extra %>
+Extra information:
+
+  <%=raw @extra %>
+<% end %>
+
 The backtrace:
 
 <%=raw @e.backtrace.join("\n") %>

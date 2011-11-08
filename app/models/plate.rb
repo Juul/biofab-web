@@ -136,7 +136,10 @@ class Plate < ActiveRecord::Base
       
       ProcessMailer.flowcyte_completed(user, plate_layout.id).deliver
     rescue Exception => e
-      ProcessMailer.error(user, e).deliver
+
+      
+
+      ProcessMailer.error(user, e, data_path).deliver
     end
   end
 
