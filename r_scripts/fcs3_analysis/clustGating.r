@@ -64,6 +64,10 @@ clustGating = function(flowset,
 					xfit = seq(x.lim[1],x.lim[2],length=100)
 					yfit = dnorm(xfit,mean=mean,sd=sd)
 					yfit = yfit*diff(h$mids[1:2])*length(flowset[[i]]@exprs[,fluos[1]]) 
+          cat("=== ylim: ", max(c(yfit,h$counts)), "\n")
+          cat("=== h$counts: ", h$counts, "\n")
+          cat("=== yfit: ", yfit, "\n")
+
 					h=hist(flowset[[i]]@exprs[,fluos[1]], breaks=breaks, border=FALSE, col="#FF000050", main=paste(flowset[[i]]@description$description," (",flowset[[i]]@description$`$WELLID`,")\n ",output[2],sep=""),xlim=c(0,4), ylim=c(-0.5, max(c(yfit,h$counts))), xlab=fluos[1])
 					d=density(flowset[[i]]@exprs[,fluos[1]])
 					d$y=d$y*h$counts[1]/h$density[1]
@@ -81,12 +85,6 @@ clustGating = function(flowset,
 			}
 			else if (noclust[i] == 2)
 			{
-	# 			if (output!=FALSE)
-	# 			{
-	# 				png(file.path(output[1],paste(flowset[[i]]@description$description, "_",flowset[[i]]@description$`$WELLID`,"_",output[2],"_1_cluster.png",sep="")))
-	# 				hist(clust.fluo[[clust.fluo@index]],flowset[[i]], main=paste(flowset[[i]]@description$description," (",flowset[[i]]@description$`$WELLID`,")\n",output[2],sep=""),xlim=c(0,4))
-	# 				dev.off()
-	# 			}
 				subpop=split(flowset[[i]], clust.fluo)
 				#sorted=sort(matrix(c(nrow(subpop[[1]]),nrow(subpop[[2]]))), index.return=TRUE, decreasing=TRUE)
 				sorted=sort(matrix(c(mean(subpop[[1]]@exprs[,fluos[1]], na.rm=TRUE),mean(subpop[[2]]@exprs[,fluos[1]], na.rm=TRUE))), index.return=TRUE, decreasing=TRUE)
@@ -128,6 +126,8 @@ clustGating = function(flowset,
 					add    = FALSE
 					index  = 1
 					for (rank in sorted$ix) {
+
+            cat("==== ymax: ", ymax, "\n")
 						plot(subh[[rank]], main=paste(flowset[[i]]@description$description," (",flowset[[i]]@description$`$WELLID`,")\n ",output[2],sep=""), xlab=fluos[1], ylab="Counts", 						     border=FALSE, col=paste(colors[index],"50",sep=""), xlim=c(0,4), ylim=c(-0.5,ymax), add=add)
 						polygon(c(subdmatrix[[rank]][1,1], subdmatrix[[rank]][,1], subdmatrix[[rank]][nrow(subdmatrix[[rank]]),1]),
 						        c(0, (subdmatrix[[rank]][,2]*adjust), 0), col=paste(colors[index],"50",sep=""), border=colors[index], lty=3)
@@ -155,16 +155,7 @@ clustGating = function(flowset,
 										 paste("n=", formatC(nrow(mix[[i]]),width=width), "; p=", formatC(mix[[i]]@description$"sw.p.value", format="e"), "\nFSC2=", formatC(mean(mix[[i]]@exprs[,"FSC-HLog"]),width=width))),
 										 text.col=c("#FF0000","#000000"), bty="n")
 					dev.off()
-	# 				p1=xyplot(`SSC-HLog`~`FSC-HLog`, flowset[[i]],
-	# 					    	xlim=c(0,1.2),ylim=c(2,2.8),smooth=FALSE, cex=2,col="red", 
-	# 							main=paste(flowset[[i]]@description$description," (",flowset[[i]]@description$`$WELLID`,")\n",output[2],sep=""))
-	# 				p2=xyplot(`SSC-HLog`~`FSC-HLog`,mix[[i]],
-	# 							xlim=c(0,1.2),ylim=c(2,2.8), smooth=FALSE, cex=2,col="gray",
-	# 							main=paste(flowset[[i]]@description$description," (",flowset[[i]]@description$`$WELLID`,")\n",output[2],sep=""))
-	# 				png(file.path(output[1],paste(flowset[[i]]@description$description, "_",flowset[[i]]@description$`$WELLID`,"_",output[2],"_scatter.png",sep="")))
-	# 				plot(p1)
-	# 				plot(p2,newpage=FALSE)
-	# 				dev.off()
+
 				}
 			}
 		}
