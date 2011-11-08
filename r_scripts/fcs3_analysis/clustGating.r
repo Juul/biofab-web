@@ -21,10 +21,12 @@ clustGating = function(flowset,
 	x.lim = c(0,4)
 	for (i in 1:length(flowset))
 	{
-    cat("Length of exprs: ", length(flowset[[i]]@exprs), "\n")
 
 		# Refine forward and side scatter gating
 		clust.cell   = flowClust(flowset[[i]], varNames=c("FSC-HLog", "SSC-HLog"), K=1, level=levels[1])
+
+    cat("Length of exprs: ", length(flowset[[i]]@exprs), "\n")
+
 
     # TODO check if _any_ clusters were found, 
     #      and somewhere before this function, make sure 
