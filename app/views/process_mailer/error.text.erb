@@ -6,7 +6,7 @@ An exception of class <%=raw @e.class.to_s %> occurred.
 
 The exception message was:
 
-  <%=raw @e.message %>
+  <%=raw @message %>
 
 <% if @extra %>
 Extra information:
@@ -14,9 +14,16 @@ Extra information:
   <%=raw @extra %>
 <% end %>
 
-The backtrace:
+<% if @r_backtrace %>
+R backtrace:
 
-<%=raw @e.backtrace.join("\n") %>
+  <%=raw @r_backtrace.join("\n") %>
+<% end %>
+
+
+Ruby backtrace:
+
+<%=raw @backtrace.join("\n") %>
 
 Have a nice day!
 
