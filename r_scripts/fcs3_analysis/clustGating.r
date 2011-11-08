@@ -123,6 +123,9 @@ clustGating = function(flowset,
 						yfit[[rank]] = dnorm(xfit[[rank]],mean=mean[[rank]],sd=sd[[rank]])
 						yfit[[rank]] = yfit[[rank]]*diff(subhmatrix[,4][1:2])*length(subpop[[rank]]@exprs[,fluos[1]])
 						ymax = max(c(yfit[[rank]], subhmatrix[,2], ymax))
+            cat("yfit[[rank]]: ", yfit[[rank]], "\n")
+            cat("subhmatrix[,2]: ", subhmatrix[,2], "\n")
+            cat("ymax: ", ymax, "\n")
             cat("---------Running for rank--------\n")
 					}
 
