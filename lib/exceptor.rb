@@ -10,7 +10,7 @@ module Exceptor
       method_name_random_string = "pAGbyeZxOMh3Py1"
       r_msg, r_backtrace = e.message.split(very_random_string)
       traces = r_backtrace.split("\n").collect {|line| line.strip.gsub(/^\d:\s/, '')}
-      traces = traces[3..(traces.length - 3)]
+#      traces = traces[3..(traces.length - 3)]
       traces = traces.collect do |trace|
         trace.gsub(method_name_random_string, 'r_method_that_was_called_from_ruby').strip
       end
