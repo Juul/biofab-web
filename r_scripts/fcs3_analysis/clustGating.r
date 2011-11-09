@@ -59,7 +59,7 @@ clustGating = function(flowset,
 			noclust[i] = clust.fluo[[clust.fluo@index]]@K
 
 
-      cat("Length of exprs: ", nrow(flowset[[i]]@exprs), "\n")
+#      cat("Length of exprs: ", nrow(flowset[[i]]@exprs), "\n")
 
 			if (noclust[i] == 1)
 			{
@@ -85,9 +85,9 @@ clustGating = function(flowset,
 					xfit = seq(x.lim[1],x.lim[2],length=100)
 					yfit = dnorm(xfit,mean=mean,sd=sd)
 					yfit = yfit*diff(h$mids[1:2])*length(flowset[[i]]@exprs[,fluos[1]]) 
-          cat("=== ylim: ", max(c(yfit,h$counts)), "\n")
-          cat("=== h$counts: ", h$counts, "\n")
-          cat("=== yfit: ", yfit, "\n")
+#          cat("=== ylim: ", max(c(yfit,h$counts)), "\n")
+#          cat("=== h$counts: ", h$counts, "\n")
+#          cat("=== yfit: ", yfit, "\n")
 
 					h=hist(flowset[[i]]@exprs[,fluos[1]], breaks=breaks, border=FALSE, col="#FF000050", main=paste(flowset[[i]]@description$description," (",flowset[[i]]@description$`$WELLID`,")\n ",output[2],sep=""),xlim=c(0,4), ylim=c(-0.5, max(c(yfit,h$counts))), xlab=fluos[1])
 					d=density(flowset[[i]]@exprs[,fluos[1]])
@@ -107,8 +107,8 @@ clustGating = function(flowset,
 			else if (noclust[i] == 2)
 			{
 				subpop=split(flowset[[i]], clust.fluo) 
-        cat("Length of subpop 1: ", nrow(subpop[[1]]@exprs), "\n")
-        cat("Length of subpop 2: ", nrow(subpop[[2]]@exprs), "\n")
+#        cat("Length of subpop 1: ", nrow(subpop[[1]]@exprs), "\n")
+#        cat("Length of subpop 2: ", nrow(subpop[[2]]@exprs), "\n")
 
 				flowset[[i]]=Subset(flowset[[i]], clust.fluo)
 
@@ -145,7 +145,7 @@ clustGating = function(flowset,
 					png(file.path(output[1],paste(flowset[[i]]@description$description, "_",flowset[[i]]@description$`$WELLID`,"_",output[2],"_2_processed.png",sep="")))
 
 					for (rank in sorted$ix) {
-            cat("---------Running for rank--------\n")             
+#            cat("---------Running for rank--------\n")             
 						r = range(subpop[[rank]]@exprs[,fluos[1]])
 						subhmatrix  = hmatrix[(hmatrix[,1]>(r[1]-disth) & hmatrix[,1]<r[2]+disth),]
 						subh[[rank]] = h
@@ -153,21 +153,21 @@ clustGating = function(flowset,
 						subh[[rank]]$counts = subhmatrix[,2][-nrow(subhmatrix)]
 						subdmatrix[[rank]]  = dmatrix[(dmatrix[,1]>(r[1]-distd) & dmatrix[,1]<r[2]+distd),]
 						mean[[rank]] = mean(subpop[[rank]]@exprs[,fluos[1]])
-            cat("mean: ", mean[[rank]], "\n")
+#            cat("mean: ", mean[[rank]], "\n")
 						sd[[rank]]   = sd(subpop[[rank]]@exprs[,fluos[1]])
-            cat("sd: ", sd[[rank]], "\n")
-            cat("sd of: ", subpop[[rank]]@exprs[,fluos[1]], "\n")
-            cat("all: ", subpop[[rank]]@exprs, "\n")
+#            cat("sd: ", sd[[rank]], "\n")
+#            cat("sd of: ", subpop[[rank]]@exprs[,fluos[1]], "\n")
+#            cat("all: ", subpop[[rank]]@exprs, "\n")
 						xfit[[rank]] = seq(x.lim[1],x.lim[2],length=100)
-            cat("xfit[[rank]] seq: ", xfit[[rank]], "\n")
+#            cat("xfit[[rank]] seq: ", xfit[[rank]], "\n")
 						yfit[[rank]] = dnorm(xfit[[rank]],mean=mean[[rank]],sd=sd[[rank]])
-            cat("yfit[[rank]] dnorm: ", yfit[[rank]], "\n")
+#            cat("yfit[[rank]] dnorm: ", yfit[[rank]], "\n")
 						yfit[[rank]] = yfit[[rank]]*diff(subhmatrix[,4][1:2])*length(subpop[[rank]]@exprs[,fluos[1]])
-            cat("yfit[[rank]] diff: ", yfit[[rank]], "\n")
+#            cat("yfit[[rank]] diff: ", yfit[[rank]], "\n")
 						ymax = max(c(yfit[[rank]], subhmatrix[,2], ymax))
-            cat("yfit[[rank]]: ", yfit[[rank]], "\n")
-            cat("subhmatrix[,2]: ", subhmatrix[,2], "\n")
-            cat("ymax: ", ymax, "\n")
+#            cat("yfit[[rank]]: ", yfit[[rank]], "\n")
+#            cat("subhmatrix[,2]: ", subhmatrix[,2], "\n")
+#            cat("ymax: ", ymax, "\n")
 
 					}
 
@@ -175,7 +175,7 @@ clustGating = function(flowset,
 					index  = 1
 					for (rank in sorted$ix) {
 
-            cat("==== ymax: ", ymax, "\n")
+#            cat("==== ymax: ", ymax, "\n")
 
 						plot(subh[[rank]], main=paste(flowset[[i]]@description$description," (",flowset[[i]]@description$`$WELLID`,")\n ",output[2],sep=""), xlab=fluos[1], ylab="Counts", 						     border=FALSE, col=paste(colors[index],"50",sep=""), xlim=c(0,4), ylim=c(-0.5,ymax), add=add)
 						polygon(c(subdmatrix[[rank]][1,1], subdmatrix[[rank]][,1], subdmatrix[[rank]][nrow(subdmatrix[[rank]]),1]),

@@ -31,7 +31,7 @@ combine.replicates = function(data) {
       if(name == "description") {
 
         combi[i, index] = data[[1]][i,name]
-        index=index+1
+        index = index + 1
 
       } else {
 
@@ -60,7 +60,7 @@ combine.replicates = function(data) {
 					combi[i, index] = mean(nbr)
 					combi[i, (index + 1)] = sd(nbr)
 					combi[i, (index + 2)] = 100 * combi[i, index + 1] / combi[i, (index)]
-					index=index+3
+					index = index + 3
 
         }
 			}
