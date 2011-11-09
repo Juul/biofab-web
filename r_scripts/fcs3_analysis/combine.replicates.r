@@ -38,11 +38,14 @@ combine.replicates = function(data) {
         nbr = vector(length=norep)
 
         for (k in 1:(norep)) {
-          write(k, file="/tmp/file_k")
-          write(i, file="/tmp/file_i")
-          write(name, file="/tmp/file_name")
-          write(data, file="/tmp/file_data")
-          nbr[k] = data[[k]][i, name]
+#          write(k, file="/tmp/file_k")
+#          write(i, file="/tmp/file_i")
+#          write(name, file="/tmp/file_name")
+          if(name %in% colnames(data[[k]]) {
+            nbr[k] = data[[k]][i, name]
+          } else {
+            nbr[k] = 0
+          }
         }
 
         if(name %in% no.combined.stat) {
