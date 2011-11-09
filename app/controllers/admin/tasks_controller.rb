@@ -12,7 +12,8 @@ class Admin::TasksController < ApplicationController
   end
 
   def foo
-    @id = 3
+
+    render :text => "module: #{m}"
   end
 
   def delay

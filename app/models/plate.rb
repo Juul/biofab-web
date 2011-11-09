@@ -43,7 +43,7 @@ class Plate < ActiveRecord::Base
 #      f.close
 
       # TODO remove hard-coded "rectangle" gating
-      data = Exceptor.call_r_func(r.run, out_path, data_path, :fluo => fluo_channel, :init_gate => "rectangle")
+      data = Exceptor::call_r_func(r.run, out_path, data_path, :fluo => fluo_channel, :init_gate => "rectangle")
 
       if !data
         raise "No data returned from analysis"
