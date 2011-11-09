@@ -21,6 +21,7 @@ class ProcessMailer < ActionMailer::Base
   end
 
   def error(user, e, extra=nil)
+    @user = user
     @r_backtrace = nil
     @extra = extra
 
@@ -34,6 +35,7 @@ class ProcessMailer < ActionMailer::Base
     @backtrace = e.backtrace
     
     mail(:to => user.email, 
+         :bcc => Settings['admin_email']
          :subject => "[FabIO] An error occurred")
   end
   
