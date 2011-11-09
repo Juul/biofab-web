@@ -8,24 +8,30 @@ extractData = function(flowset,
                        scale="Lin", 
                        CV.treshold=1, 
                        low.rm=FALSE) {
+  cat("Got here 1\n")
 
 	if (class(flowset) != "flowSet") {
     return(NULL)
   }
+
+  cat("Got here 2\n")
 	
 	# Initialization
 	names=c()
 	is.bkgd = FALSE
 	is.ref  = FALSE
+  cat("Got here 3\n")
 	if (is.list(mapping)) {
 		names =c("description")
 		fluo.type = names(table(unlist(strsplit(mapping$fluo,"/"))))
 		if ("background" %in% colnames(mapping)) is.bkgd = TRUE
 		if ("reference"  %in% colnames(mapping)) is.ref  = TRUE
 	}
+  cat("Got here 4\n")
 	if(fluo != "") {
 		fluo.type=fluo
   }
+  cat("Got here 5\n")
 
 	names =c(names, "cluster.nbr", "cell.nbr")
 	fluos = get.fluo(fluo.type, scale)
@@ -34,19 +40,26 @@ extractData = function(flowset,
 		names =c(names, paste("mean.",fluos[i],sep=""), paste("sd.",fluos[i],sep=""), paste("pval.",fluos.log[i],sep=""))
 		if (is.bkgd) names=c(names,paste("mean.bkgd.",fluos[i],sep=""))
 	}
+  cat("Got here 6\n")
+
 	TE=NULL
 	if (is.ref) {
 		names=c(names,"ratio.bulk","mean.ratio.cell","sd.ratio.cell", "TE.bulk", "TE.cell")
 		TE   = vector("list", length(flowset))
 		names(TE)=sampleNames(flowset)
 	}
+  cat("Got here 7\n")
+
 	names=c(names,"status")
 	data = matrix(data=NA, ncol=length(names), nrow=length(flowset), dimnames=list(sampleNames(flowset), names))
 	## Initial calculations for background, making sure all samples are in the dataset
+
+  cat("Got here 8\n")
 	if (is.bkgd) {
 		simple_names  = names(table(unlist(strsplit(mapping$background,"/"))))
 		# check wells are in dataset
 		check=simple_names %in% sampleNames(flowset)
+    cat("Got here 8a\n")
 		if (!all(check)) {
 			cat("These background samples (", paste(simple_names[!check],sep=", "),") are not included in the dataset (",paste(sampleNames(flowset),sep=", "),")\n")
 			simple_names=simple_names[check] }
@@ -57,26 +70,34 @@ extractData = function(flowset,
 		bkgk.names = c(simple_names, formula_names)
 		# mean calculation
 		bkgd = matrix(data=NA, nrow=length(bkgk.names), ncol=length(fluo.type), dimnames=list(bkgk.names, fluos))
+    cat("Got here 8b\n")
 		for (sample in simple_names)
 			for (f in fluos) 
 				bkgd[sample, f]  = mean(flowset[[sample]]@exprs[, f], na.rm=TRUE)
+    cat("Got here 8c\n")
 		for (sample in formula_names)
 			for (f in fluos) 
 				bkgd[sample, f]  = mean(bkgd[unlist(strsplit(sample,"/")), f], na.rm=TRUE)
 	}
 	
+  cat("Got here 9\n")
+
 	## Initial calculations for references, making sure all samples are in the dataset
 	if (is.ref)
 	{
+    cat("Got here 10\n")
 		simple_names =names(table(unlist(strsplit(mapping$reference,"/"))))
 		# check reference are in dataset
 		check=simple_names %in% sampleNames(flowset)
+    cat("Got here 11\n")
 		if (!all(check)) {
+      cat("Got here 12\n")
 			cat("These reference samples (", paste(simple_names[!check],sep=", "),") are not included in the dataset (",paste(sampleNames(flowset),sep=", "),")\n")
 			simple_names=simple_names[check] }
 		# further checks that corresponding backgrounds are in dataset
 		check= mapping[simple_names,"background"] %in% sampleNames(flowset)
 		if (!all(check)) {
+      cat("Got here 13\n")
 			cat("These reference samples (", paste(simple_names[!check],sep=", "),") have no corresponding background in the dataset (",paste(sampleNames(flowset),sep=", "),")\n")
 			simple_names=simple_names[check] }
 		formula_names = c()
@@ -102,6 +123,7 @@ extractData = function(flowset,
 				ref[sample, type] = mean(ref[unlist(strsplit(sample,"/")), type], na.rm=TRUE)
 	}
 	
+  cat("Got here 14\n")
 	# Calculations for all samples
 	for (well in sampleNames(flowset))
 	{
@@ -155,6 +177,8 @@ extractData = function(flowset,
 				data[well,paste("pval.",f,sep="")] =as.numeric(flowset[[well]]@description[[paste(f,".sw.p.value",sep="")]])
 		}
 	}
+  cat("Got here 15\n")
+
 	data[,"cell.nbr"]    = as.numeric(unlist(keyword(flowset,"cell.nbr"), use.names=FALSE))
 	data[,"cluster.nbr"] = as.numeric(unlist(keyword(flowset,"cluster"), use.names=FALSE))
 	data=data.frame(data)
