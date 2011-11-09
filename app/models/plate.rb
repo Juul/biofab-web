@@ -27,10 +27,12 @@ class Plate < ActiveRecord::Base
       # Initialize R and load the r source file
       r = RSRuby.instance
       r.setwd(script_dir)
-      r.source(File.join(script_dir, 'fcs3_analysis.r'))
 
       # For better exception handling (needed for Exceptor module to work)
-      r.source(File.join(Rails.root, 'r_scripts', 'exceptor.r'))
+      r.source(File.join(script_dir, 'exceptor.r'))
+
+      # Flow cytometer analysis script
+      r.source(File.join(script_dir, 'fcs3_analysis.r'))
 
       # The current directory to process
       # This will have one subdir per replicate
