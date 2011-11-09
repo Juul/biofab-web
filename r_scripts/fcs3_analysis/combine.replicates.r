@@ -41,7 +41,7 @@ combine.replicates = function(data) {
 #          write(k, file="/tmp/file_k")
 #          write(i, file="/tmp/file_i")
 #          write(name, file="/tmp/file_name")
-          if((name %in% colnames(data[[k]])) & (nrows(data[[k]]) >= i)) {
+          if((name %in% colnames(data[[k]])) & (nrow(data[[k]]) >= i)) {
             nbr[k] = data[[k]][i, name]
           } else {
             nbr[k] = 0
