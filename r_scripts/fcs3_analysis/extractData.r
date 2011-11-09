@@ -127,25 +127,33 @@ extractData = function(flowset,
 	# Calculations for all samples
 	for (well in sampleNames(flowset))
 	{
+    cat("Got here 14a\n")
 		if (fluo!=FALSE) fluos = get.fluo(fluo, scale)
 		else if (is.list(mapping)) fluos = get.fluo(mapping[well,"fluo"], scale)
+    cat("Got here 14b\n")
 		#remove cells below twice the background on denominator channel
 		if (low.rm & is.bkgd & is.ref)
 			if ((!well %in% bkgk.names) & (mapping[well,"background"] %in% row.names(bkgd))) {
 				flowset[[well]]=flowset[[well]][flowset[[well]]@exprs[, fluos[2]] >= 2*bkgd[mapping[well,"background"],fluos[2]]]
 				flowset[[well]]@description$cell.nbr = nrow(flowset[[well]])
 			}
+    cat("Got here 14c\n")
+
 		if (flowset[[well]]@description$cell.nbr<=0){
 			if (flowset[[well]]@description$status!="Not set")
 				flowset[[well]]@description$status=paste(flowset[[well]]@description$status, "No cells", sep=" / ")
 	  	    else
          		flowset[[well]]@description$status="No cells"
+      cat("Got here 14d\n")
 		}
 		else {
+      cat("Got here 14e\n")
 			for (f in fluos) {
+        cat("Got here 14f\n")
 				data[well,paste("mean.", f, sep="")] = mean(flowset[[well]]@exprs[, f], na.rm=TRUE)
 				data[well,paste("sd."  , f, sep="")] =   sd(flowset[[well]]@exprs[, f], na.rm=TRUE)
 				if (data[well,paste("sd.", f, sep="")]/data[well,paste("mean.", f, sep="")]>=CV.treshold){
+          cat("Got here 14g\n")
         			if (flowset[[well]]@description$status!="Not set")
 						flowset[[well]]@description$status=paste(flowset[[well]]@description$status, paste(f, " CV>", CV.treshold, sep=""), sep=" / ")
 			  		else
@@ -156,7 +164,8 @@ extractData = function(flowset,
 						data[well,paste("mean.",f,sep="")]
 						data[well,paste("mean.bkgd.",f,sep="")] =data[well,paste("mean.",f,sep="")]-bkgd[mapping[well,"background"],f]
 					}
-			} 
+			}
+      cat("Got here 14h\n") 
 			if (is.ref){
 				if (!(well %in% row.names(bkgd)) & (mapping[well,"background"] %in% row.names(bkgd))){
 					data[well,"ratio.bulk"] = data[well, paste("mean.bkgd.", fluos[1],sep="")] / data[well, paste("mean.bkgd.", fluos[2],sep="")]
@@ -164,6 +173,7 @@ extractData = function(flowset,
 			    		 / (flowset[[well]]@exprs[, fluos[2]] - bkgd[mapping[well,"background"], fluos[2]]) )
 					data[well, "mean.ratio.cell"] = mean(r, na.rm=TRUE)
 					data[well, "sd.ratio.cell"]   =   sd(r, na.rm=TRUE)
+          cat("Got here 14i\n")
 					if (mapping[well,"reference"] %in% row.names(ref)) {
 						data[well,"TE.bulk"] = 100 * (1 - data[well,"ratio.bulk"] / ref[mapping[well,"reference"],"bulk"])
 						data[well,"TE.cell"] = 100 * (1 - data[well, "mean.ratio.cell"] / ref[mapping[well,"reference"],"cell"]) 
@@ -171,8 +181,12 @@ extractData = function(flowset,
 					}
 				}
 			}
+      cat("Got here 14j\n")
 			if (fluo!=FALSE) fluos = get.fluo(fluo, "Log")
 			else if (is.list(mapping)) fluos = get.fluo(mapping[well,"fluo"], "Log")
+
+      cat("Got here 14k\n")
+
 			for (f in fluos)
 				data[well,paste("pval.",f,sep="")] =as.numeric(flowset[[well]]@description[[paste(f,".sw.p.value",sep="")]])
 		}
