@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111110081535) do
+ActiveRecord::Schema.define(:version => 20111110210904) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.integer  "resource_id",   :null => false
@@ -101,6 +101,14 @@ ActiveRecord::Schema.define(:version => 20111110081535) do
   create_table "collections_parts", :id => false, :force => true do |t|
     t.integer "collection_id"
     t.integer "part_id"
+  end
+
+  create_table "data_files", :force => true do |t|
+    t.string   "content_type"
+    t.string   "filepath"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "data_file_set_id"
   end
 
   create_table "delayed_jobs", :force => true do |t|

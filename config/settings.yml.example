@@ -11,3 +11,8 @@ google_username: false
 google_password: false
 google_docs_key: false
 
+# where data files are stored
+# the _is_relative specifies whether the paht is relative to Rails.root
+# make sure this is writable by the user or group running the rails process
+data_files_path: /data_files
+data_files_path_is_relative: true
