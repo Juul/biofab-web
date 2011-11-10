@@ -51,6 +51,11 @@ clustGating = function(flowset,
 			fluos = get.fluo(mapping[i,"fluo"], scale)
     }
 
+    cat("Length fluos: ", length(fluos), "\n")
+    cat("Length flowset[[i]]: ", length(flowset[[i]]), "\n")
+    cat("Length K: ", length(1:2), "\n")
+    cat("length levels: ", length(levels[2]), "\n")
+
     # Check if there are more than 10 measurements left after gating for forward and side scatter
     if(length(fluos)!=0 & nrow(flowset[[i]]@exprs)>10) {
 
