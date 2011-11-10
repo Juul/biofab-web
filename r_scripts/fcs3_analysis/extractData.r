@@ -155,18 +155,24 @@ extractData = function(flowset,
         cat("Got here 14f_2\n")
 				data[well,paste("sd."  , f, sep="")] =   sd(flowset[[well]]@exprs[, f], na.rm=TRUE)
         cat("Got here 14f_3\n")
-				if (data[well,paste("sd.", f, sep="")]/data[well,paste("mean.", f, sep="")]>=CV.treshold){
+
+        if(data[well,paste("sd.", f, sep="")]/data[well,paste("mean.", f, sep="")]>=CV.treshold) {
           cat("Got here 14g\n")
-        			if (flowset[[well]]@description$status!="Not set")
+          if (flowset[[well]]@description$status!="Not set") {
 						flowset[[well]]@description$status=paste(flowset[[well]]@description$status, paste(f, " CV>", CV.treshold, sep=""), sep=" / ")
-			  		else
-          				flowset[[well]]@description$status=paste(f, " CV>", CV.treshold, sep="")
-          		}
-      			if (is.bkgd)
+          } else {
+            flowset[[well]]@description$status=paste(f, " CV>", CV.treshold, sep="")
+          }
+        }
+        cat("Got here 14_forgot\n")
+        if (is.bkgd) {
+          cat("Got here 14_forgot_2\n")
 					if (mapping[well,"background"] %in% row.names(bkgd)) {
+            cat("Got here 14_forgot_3\n")
 						data[well,paste("mean.",f,sep="")]
 						data[well,paste("mean.bkgd.",f,sep="")] =data[well,paste("mean.",f,sep="")]-bkgd[mapping[well,"background"],f]
 					}
+        }
 			}
       cat("Got here 14h\n") 
 			if (is.ref){
