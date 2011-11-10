@@ -149,9 +149,12 @@ extractData = function(flowset,
 		else {
       cat("Got here 14e\n")
 			for (f in fluos) {
-        cat("Got here 14f\n")
+        cat("Number of exprs", length(flowset[[well]]@exprs), "\n")
+        cat("Got here 14f_1\n")
 				data[well,paste("mean.", f, sep="")] = mean(flowset[[well]]@exprs[, f], na.rm=TRUE)
+        cat("Got here 14f_2\n")
 				data[well,paste("sd."  , f, sep="")] =   sd(flowset[[well]]@exprs[, f], na.rm=TRUE)
+        cat("Got here 14f_3\n")
 				if (data[well,paste("sd.", f, sep="")]/data[well,paste("mean.", f, sep="")]>=CV.treshold){
           cat("Got here 14g\n")
         			if (flowset[[well]]@description$status!="Not set")
