@@ -156,24 +156,20 @@ extractData = function(flowset,
 				data[well,paste("sd."  , f, sep="")] =   sd(flowset[[well]]@exprs[, f], na.rm=TRUE)
         cat("Got here 14f_3\n")
 
+
         dtop = data[well,paste("sd.", f, sep="")]
         dbottom = data[well,paste("mean.", f, sep="")]
-        cat("Got here 14g_pre_pre\n")
-        if(!is.na(dtop / dbottom)) {
-          cat("Got here 14g_pre\n")
-          if(dtop / dbottom >= CV.treshold) {
-            cat("Got here 14g\n")
-            if (flowset[[well]]@description$status!="Not set") {
-              flowset[[well]]@description$status=paste(flowset[[well]]@description$status, paste(f, " CV>", CV.treshold, sep=""), sep=" / ")
-          } else {
-            flowset[[well]]@description$status=paste(f, " CV>", CV.treshold, sep="")
+
+        if(dtop / dbottom >= CV.treshold) {
+          cat("Got here 14g\n")
+          if (flowset[[well]]@description$status!="Not set") {
+						flowset[[well]]@description$status=paste(flowset[[well]]@description$status, paste(f, " CV>", CV.treshold, sep=""), sep=" / ")
+			    } else {
+          	flowset[[well]]@description$status=paste(f, " CV>", CV.treshold, sep="")
           }
         }
-        cat("Got here 14_forgot\n")
         if (is.bkgd) {
-          cat("Got here 14_forgot_2\n")
 					if (mapping[well,"background"] %in% row.names(bkgd)) {
-            cat("Got here 14_forgot_3\n")
 						data[well,paste("mean.",f,sep="")]
 						data[well,paste("mean.bkgd.",f,sep="")] =data[well,paste("mean.",f,sep="")]-bkgd[mapping[well,"background"],f]
 					}
