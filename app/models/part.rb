@@ -52,6 +52,10 @@ class Part < ActiveRecord::Base
     (biofab_id.blank?) ? 'NO_ID' : biofab_id
   end
 
+  def self.by_id(id)
+    self.where(["biofab_id = ? OR duplicates like ?", id, "%!#{id}!%"]).first
+  end
+
   def descriptor
     "#{biofab_id}: #{description}"
   end

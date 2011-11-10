@@ -28,30 +28,45 @@ while(!g.cell(row, 1).blank?)
     exit
   end
 
-  if Part.where(["biofab_id = ?", biofab_id]).first
-    puts "Skipped #{biofab_id}: Already in the database."
-    row +=1
-    next
+  part = Part.where(["biofab_id = ?", biofab_id]).first
+  if part
+    puts "Updating part: #{part.biofab_id}"
+  else
+
+    existing = Part.where(["sequence = ? AND biofab_id <> ?", sequence, biofab_id]).first
+    if existing
+      puts "-- This is a duplicate of existing part #{existing.biofab_id}"
+      if !existing.duplicates.blank?
+        duplicates = existing.duplicates.gsub('!', '').split(',')
+      else
+        duplicates = []
+      end
+      if !duplicates.index(biofab_id)
+        duplicates << biofab_id
+        existing.duplicates = duplicates.collect {|dupe| "!#{dupe}!"}.join(',')
+        existing.save!
+      end
+
+      row += 1
+      next
+    end    
+
+
+    puts "New part: #{biofab_id}"
+    part = Part.new
   end
 
-  old_part = Part.where(["sequence = ?", sequence]).first
-  if old_part
-    puts "Skipped #{biofab_id}: Same sequence as #{old_part.biofab_id}"
-    row +=1
-    next
-  end
 
-  part = Part.new
   part.biofab_id = biofab_id
   part.sequence = sequence
   part.description = description
   part.part_type = part_type
-  
+
   begin
     part.save!
-    puts "Imported #{biofab_id}"
+#    puts "Imported #{biofab_id}"
   rescue Exception => e
-    puts "Failed to import #{biofab_id}: #{e.message}"
+    puts "Failed to save #{biofab_id}: #{e.message}"
   end
 
   row += 1

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111102214822) do
+ActiveRecord::Schema.define(:version => 20111110081535) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.integer  "resource_id",   :null => false
@@ -171,6 +171,7 @@ ActiveRecord::Schema.define(:version => 20111102214822) do
     t.integer  "plasmid_info_id"
     t.integer  "part_type_id"
     t.integer  "project_id"
+    t.text     "duplicates"
   end
 
   create_table "performance_types", :force => true do |t|
