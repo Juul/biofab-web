@@ -156,10 +156,15 @@ extractData = function(flowset,
 				data[well,paste("sd."  , f, sep="")] =   sd(flowset[[well]]@exprs[, f], na.rm=TRUE)
         cat("Got here 14f_3\n")
 
-        if(data[well,paste("sd.", f, sep="")]/data[well,paste("mean.", f, sep="")]>=CV.treshold) {
-          cat("Got here 14g\n")
-          if (flowset[[well]]@description$status!="Not set") {
-						flowset[[well]]@description$status=paste(flowset[[well]]@description$status, paste(f, " CV>", CV.treshold, sep=""), sep=" / ")
+        dtop = data[well,paste("sd.", f, sep="")]
+        dbottom = data[well,paste("mean.", f, sep="")]
+        cat("Got here 14g_pre_pre\n")
+        if(!is.na(dtop / dbottom)) {
+          cat("Got here 14g_pre\n")
+          if(dtop / dbottom >= CV.treshold) {
+            cat("Got here 14g\n")
+            if (flowset[[well]]@description$status!="Not set") {
+              flowset[[well]]@description$status=paste(flowset[[well]]@description$status, paste(f, " CV>", CV.treshold, sep=""), sep=" / ")
           } else {
             flowset[[well]]@description$status=paste(f, " CV>", CV.treshold, sep="")
           }
