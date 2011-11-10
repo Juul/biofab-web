@@ -53,11 +53,12 @@ clustGating = function(flowset,
 
     cat("Length fluos: ", length(fluos), "\n")
     cat("Length flowset[[i]]: ", length(flowset[[i]]), "\n")
+    cat("Length nrow: ", nrow(flowset[[i]]@exprs), "\n")
     cat("Length K: ", length(1:2), "\n")
     cat("length levels: ", length(levels[2]), "\n")
 
     # Check if there are more than 10 measurements left after gating for forward and side scatter
-    if(length(fluos)!=0 & nrow(flowset[[i]]@exprs)>10) {
+    if(length(fluos)!=0 & nrow(flowset[[i]]@exprs)>500) {
 
 			clust.fluo = flowClust(flowset[[i]], varNames=fluos, K=1:2, level=levels[2], criterion="ICL", nu=4, nu.est=0, trans=0, randomStart=25)
 			clust.fluo = refine.selection(clust.fluo)
