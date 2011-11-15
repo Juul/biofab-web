@@ -6,6 +6,12 @@ class PlateLayout < ActiveRecord::Base
   has_many :wells, :class_name => 'PlateLayoutWell'
   has_many :plates
 
+  def analyze_replicate_dirs(replicate_dirs, user)
+    replicate_dirs.each do |rep_dir|
+      plate_layout.analyze_replicate_dir(rep_dir, user)
+    end
+  end
+
 
   def analyze_replicate_dir(replicate_dir, user)
     begin
@@ -56,6 +62,11 @@ class PlateLayout < ActiveRecord::Base
 
         original_fcs_file = DataFile.from_local_file(input_file_path, 'original_fcs_file')
         well.files << original_fcs_file
+
+        if! data['outfile_plot']
+          raise "Key: #{input_file_path}. Data: #{data}."
+        end
+
         plot_file = DataFile.from_local_file(data['outfile_plot'], 'plot')
         well.files << plot_file
 
@@ -137,7 +148,7 @@ class PlateLayout < ActiveRecord::Base
             fcs_count += 1
           end
         end
-        if (fcs_count > 1)  # XXX temporary debug
+        if (fcs_count >= 96) 
           subdir_count += 1
         end
       end

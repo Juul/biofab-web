@@ -26,16 +26,9 @@ class PlateLayoutController < ApplicationController
       replicate_dirs << replicate_entry_path
     end
 
-    replicate_dirs.each do |rep_dir|
+    plate_layout.delay.analyze_replicate_dirs(replicate_dirs, current_user)
     
-      plate_layout.delay.analyze_replicate_dir(rep_dir, current_user)
-      render :text => "queued job"
-      return
-
-    end
-
-    
-    render :text => 'done analyzing'
+    render :text => 'queued job'
   end
 
   def analyze

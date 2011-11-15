@@ -238,11 +238,12 @@ class Plate < ActiveRecord::Base
     layout_sheet = xls_add_plate_layout_sheet(workbook)
     value_sheet = xls_add_plate_sheet(workbook, 'Characterization')
     sd_sheet = xls_add_plate_sheet(workbook, 'Standard deviation')
+    var_sheet = xls_add_plate_sheet(workbook, 'Variance')
 
     wells.each do |well|
-      characterization = well.replicate.characterizations.first
-      value_sheet[well.row.to_i, well.column.to_i] = characterization.value
-      sd_sheet[well.row.to_i, well.column.to_i] = characterization.standard_deviation
+      value_sheet[well.row.to_i, well.column.to_i] = well.replicate.characterization_with_type_name('mean').value
+      sd_sheet[well.row.to_i, well.column.to_i] = well.replicate.characterization_with_type_name('standard_deviation').value
+      var_sheet[well.row.to_i, well.column.to_i] = well.replicate.characterization_with_type_name('variance').value
     end
 
     out_path = File.join(Rails.root, 'public', "plate_#{id}_characterization.xls")
