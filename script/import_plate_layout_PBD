@@ -133,6 +133,7 @@ while(true)
     elsif(cds_type == 'RFP')
       cds = Part.by_id('apFAB351')
     elsif(cds_type == "NONE") || cds_type.blank?
+      cds = nil
       puts "no cds"
     else
      raise "WTF?!"
