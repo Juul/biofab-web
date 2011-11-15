@@ -63,7 +63,7 @@ class PlateLayout < ActiveRecord::Base
         original_fcs_file = DataFile.from_local_file(input_file_path, 'original_fcs_file')
         well.files << original_fcs_file
 
-        if! data['outfile_plot']
+        if !data['outfile_plot']
           raise "Key: #{input_file_path}. Data: #{data}."
         end
 
