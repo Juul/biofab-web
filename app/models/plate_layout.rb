@@ -8,7 +8,7 @@ class PlateLayout < ActiveRecord::Base
 
   def analyze_replicate_dirs(replicate_dirs, user)
     replicate_dirs.each do |rep_dir|
-      plate_layout.analyze_replicate_dir(rep_dir, user)
+      self.analyze_replicate_dir(rep_dir, user)
     end
   end
 
