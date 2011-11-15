@@ -1,0 +1,24 @@
+#!script/rails runner
+
+PlateLayout.all.each do |layout|
+  layout.wells.all.each do |well|
+    channel = nil
+    if well.comment
+      if well.comment.match(/gfp/i)
+        channel = 'green'
+      elsif well.comment.match(/rfp/i)
+        channel = 'red'
+      end
+    end
+    if well.eou && well.eou.cds && well.eou.cds.description
+      if well.eou.cds.description.match(/gfp/i)
+        channel = 'green'
+      elsif well.eou.cds.description.match(/rfp/i)
+        channel = 'red'
+      end
+    end
+    if !channel
+      puts "Layout: #{layout.name}. Well: #{well.row}.#{well.column}"
+    end
+  end
+end

@@ -20,7 +20,6 @@ class PlateLayout < ActiveRecord::Base
       ProcessMailer.error(user, e, cur_rep_dir).deliver
 
     end
-
   end
 
 
