@@ -56,16 +56,16 @@ class PlateLayout < ActiveRecord::Base
       plate.name = self.name # TODO what would be a good name?
 
       data_set.each_pair do |input_file_path, data|
+
+        if !data
+          next
+        end
         
         well = PlateWell.new
         plate.wells << well
 
         original_fcs_file = DataFile.from_local_file(input_file_path, 'original_fcs_file')
         well.files << original_fcs_file
-
-        if !data['outfile_plot']
-          raise "Key: #{input_file_path}. Data: #{data}."
-        end
 
         plot_file = DataFile.from_local_file(data['outfile_plot'], 'plot')
         well.files << plot_file
