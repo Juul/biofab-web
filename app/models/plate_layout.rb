@@ -22,8 +22,8 @@ class PlateLayout < ActiveRecord::Base
       
       # fluo = 'RED'
       fluo = 'GRN'
-      init_gate = 'ellipse'
-      # init_gate = 'rectangle'
+      #init_gate = 'ellipse'
+      init_gate = 'rectangle'
       
       fcs_file_paths = []
       
