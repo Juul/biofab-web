@@ -1,21 +1,33 @@
 
-# TODO: make this better!
+# Get the real name of the fluorescence channels
+# based on channel (GRN, RED) and scale(""
+
+# TODO rename this
+#   should be called get.channel.name(channel, scale)
 
 get.fluo = function(fluo, scale="") {
-	if (is.na(fluo)) return(c())
-	fluo=unlist(strsplit(fluo, "/"))
-	for(f in fluo)
-		if (!(f %in% fluo.type)) fluo.type<<-append(fluo.type, f)
-	if(scale %in% c("Lin", "Log")) {
-		for(i in 1:length(fluo)) {
-			if(fluo[i] == "GRN") {
-        fluo[i]=paste(fluo[i],"-H",scale,sep="")
-      } else if(fluo[i] == "RED") {
-        fluo[i]=paste(fluo[i],"2-H",scale,sep="")
-      }	else {
-        return(-1) 
-      }
-    }
+
+  if(is.na(fluo)) {
+    return(NULL)
   }
-	return(fluo)
+
+  if(scale %in% c("Lin", "Log")) {
+    if(fluo == "GRN") {
+
+      fluo = paste(fluo, "-H", scale, sep="")
+
+    } else if(fluo == "RED") {
+
+      fluo = paste(fluo, "2-H", scale, sep="")
+
+    }  else {
+
+      return(NULL) 
+
+    }
+  } else {
+    return(NULL)
+  }
+
+  return(fluo)
 }

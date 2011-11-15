@@ -12,6 +12,32 @@ class PlateLayoutController < ApplicationController
 
   end
 
+  def analyze2
+
+    plate_layout = PlateLayout.find(params['id'])
+
+    replicate_dirs = []
+
+    dir = Dir.new(params['path'])
+    dir.each do |replicate_entry|
+      next if (replicate_entry == '.') || (replicate_entry == '..')
+      replicate_entry_path = File.join(params['path'], replicate_entry)
+      next if !File.directory?(replicate_entry_path)
+      replicate_dirs << replicate_entry_path
+    end
+
+    replicate_dirs.each do |rep_dir|
+    
+      plate_layout.delay.analyze_replicate_dir(rep_dir, current_user)
+      render :text => "queued job"
+      return
+
+    end
+
+    
+    render :text => 'done analyzing'
+  end
+
   def analyze
     plate_layout = PlateLayout.find(params['id'])
     if params['channel'] == 'red'
@@ -36,30 +62,7 @@ class PlateLayoutController < ApplicationController
       return
     end
 
-    @dirs = []
-    # TODO move path to settings.rb
-    dir_path = File.join(Rails.root, 'public', 'flow_cytometer_input_data')
-    dir = Dir.new(dir_path)
-    dir.each do |entry|
-      next if (entry == '.') || (entry == '..')
-      entry_path = File.join(dir_path, entry)
-      next if !File.directory?(entry_path)
-      subdir = Dir.new(entry_path)
-      subdir_count = 0
-      subdir.each do |subentry|
-        next if (subentry == '.') || (subentry == '..')
-        next if !File.directory?(File.join(dir_path, entry, subentry))
-        subdir_count += 1
-      end
-      if subdir_count > 0
-        @dirs << {
-          :name => entry,
-          :num_files => subdir_count,
-          :created_at => File.ctime(subdir.path)
-        }      
-      end
-    end
-
+    @dirs = PlateLayout.list_valid_fcs_dirs
 
 
 

@@ -8,14 +8,15 @@ library(RSvgDevice)
 
 # parameters
 layout.folder = file.path(getwd(),"Dropbox/BIOFAB/Wet Lab/Data/Plate layout") # TODO static!
-fluo.type <<-c() # TODO why does this use <<- instead of <- ?
+
+# fluo.type <<-c()
 
 source('run.r')
+source('cat.attr.r')
 source('norm2length.r')
 source('get.fluo.r')
 source('clean.flowSet.r')
 source('nameByWell.r')
-source('getMapping.r')
 source('ellipseGateFilter.r')
 source('rectangularGateFilter.r')
 source('cov.matrix.r')
@@ -24,6 +25,11 @@ source('refine.selection.r')
 source('extractData.r')
 source('combine.replicates.r')
 source('multi.ecdf.r')
+source('draw.plot.r')
+source('draw.plot.double.r')
+#source('random.string.r')
+source('batch.r')
+source('error.data.r')
 
 # Better error output but prevents exceptions bubbling up to ruby
 #

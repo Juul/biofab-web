@@ -1,265 +1,159 @@
 
-
-run = function(out_path, 
-               path, 
-               pattern="", 
-               layout.path="", 
-               layout.pattern=pattern, 
-               fluo="", 
+run = function(out.path.fcs,
+               out.path.plot,
+               fcs.path, # path of single fcs file
+               fluo.channel="", # RED, GRN or ? (TODO)
                clean=TRUE, 
-               cluster=TRUE, 
-               init.gate="ellipse", 
-               mode="auto", 
-               clust_levels=c(0.95,0.95), 
-               verbose=TRUE) {
+               cluster=TRUE,
+               init.gate="ellipse",
+               output.filename="out.fcs",
+               output.filename.cluster2="out.cluster2.fcs",
+               clust.levels=c(0.95,0.95), 
+               scale.gating="Lin", 
+               scale.analysis="Log",
+               verbose=FALSE) {
 
-	# Guess whether to go in duplicate (if folder with correct pattern detected) or single mode (otherwise)
-	folders = dir(path=path, recursive=FALSE, full.names=TRUE, pattern=pattern)
-
-	for(ignored.folders in c("plot","cleaned_data","bad")) {
-		folders = folders[grep(ignored.folders, basename(folders), ignore.case=TRUE, value=FALSE, invert=TRUE)]
+  if(verbose) {
+    cat("----------------------------------------------------------\n")
+    cat("Now analyzing FCS file: ", fcs.path, "\n")
+    cat("----------------------------------------------------------\n")
   }
 
-	folders = folders[file.info(folders)$isdir==TRUE]
+  # === Initialization ===
 
-	if (mode == "auto") {
-		if(length(folders) == 0) {
-      mode = "single"	
-    } else {
-      mode = "replicate"
+  data = vector("list")
+  mixed = vector("list")
+  flowframe2 = NULL
+
+  # === Read fcs file ===
+
+  flowset = read.flowSet(path=dirname(fcs.path), pattern=basename(fcs.path))
+
+  if(length(flowset) != 1) {
+    return(error.data("Failed to read FCS file"))
+  }
+
+  # minimum number of events
+  if(nrow(flowset[[1]]@exprs) < 50) {
+    return(error.data("Too few events"))
+  }
+
+  if(verbose) {
+    cat("  Events: ", nrow(flowset[[1]]@exprs), "\n")
+    cat("  Well name: ", flowset[[1]]@description$`$WELLID`, "\n")
+  }
+
+  # check if fluorescence is invalid
+  if(class(get.fluo(fluo.channel, scale.gating)) == 'NULL') {
+    return(error.data("Invalid fluorescence channel"))
+  }
+
+  if(clean == FALSE) {
+
+    if(verbose) {
+      cat("No cleaning...\n")
     }
-  }
 
-	if (mode == "single") {
-		if (verbose) cat("Run initiated in single mode\n")
-		folders   = path
-		splitpath = unlist(strsplit(path,"/"))
-		path      = do.call(file.path, as.list(splitpath[1:(length(splitpath)-1)]))
-  } else if (verbose) {
-		cat("Run initiated in replicate mode\nFound the following folders:\n")
-		cat(folders,sep="\n")
-  }
+  } else {
 
-	# Get layout file
-	ismapped = FALSE
-	mapping  = FALSE
-	if((layout.path != "") && (!file.info(layout.path)$isdir))
-	{
-		if (verbose) cat("Specified layout: ", layout.path,"\n")
-		mapping = getMapping(layout.path)
-		ismapped=TRUE
-	}
-	else if (layout.pattern != "")
-	{
-		layout.files = list.files(path=layout.path, pattern=layout.pattern, full.names=TRUE)
+    # === Clean ===
 
-		if (length(layout.files) == 1) {
-			if (verbose) cat("Found the following layout: ", layout.files,"\n")
-			mapping = getMapping(layout.files)
-			ismapped=TRUE }
-		else if (length(layout.files) > 1) {
-			if (verbose) cat("Found several layouts, please refine matching pattern:\n")
-			return(print(layout.files)) }
-		else if (verbose)  {
-      cat("No layout found...\n")
-      return
+    if(verbose) {
+      cat("Cleaning... \n")
     }
-	}
-	if (ismapped == FALSE) # try to search locally for files containing layout and same name as input
-	{
-		layout.files = list.files(path=path, pattern="layout", recursive=TRUE, full.names=TRUE)
-		layout.files = layout.files[grep(basename(path), layout.files)]
-		if (length(layout.files) == 1) {
-			if (verbose) cat("Found the following layout: ", layout.files,"\n")
-			mapping = getMapping(layout.files)
-			ismapped=TRUE }
-		else if (length(layout.files) > 1) {
-			if (verbose) {
-				cat("Found several possible layouts, in specified path", layout.files,sep="\n")
-				cat("Selected: ", min(layout.files), "\n")
+
+    flowset = clean.flowSet(flowset, fluo.channel=fluo.channel, scale=scale.gating)
+
+    # === Select filter ===
+
+    filter = NULL
+    if(init.gate == "ellipse") {
+      if(verbose) {
+        cat("Recapitulate ellipsoidal gating... \n")
       }
-			mapping = getMapping(min(layout.files))
-			ismapped=TRUE }
-	}
+      filter = ellipseGateFilter(flowset)
 
-	if (ismapped == FALSE) {
-		if(verbose) {
-      cat("No layout specified...\n")
-    }
-  }
+    } else if(init.gate == "rectangle") {
 
-  # == Mapping read (or no mapping) ==
-
-	# Process fluo
-	# Processed in sub-functions
-
-	if(fluo == "" & !ismapped & verbose) {
-    cat("No fluorescence channel selected...\n")
-    return(FALSE)
-  }
-
-	# Cluster and restrictions
-	if(is.logical(cluster)) {
-		if(cluster == TRUE) {
-      clusterize = TRUE
-    }
-  }	else if(is.list(cluster)) {
-		clusterize=TRUE
-	} else {
-		clusterize=FALSE
-  }
-
-
-	# == Analyze the data ==
-
-	data = vector("list")
-	mixed = vector("list")
-
-	for(i in 1:length(folders)) {
-
-		if(verbose) {
-      cat("Reading folder ",folders[i],"...\n",sep="")
-    }
-
-		pheno=FALSE
-		if(length(list.files(path=folders[i], pattern="annotation.txt", full.names=FALSE))==1) {
-			pheno="annotation.txt"
-    }
-
-		flowset=read.flowSet(path=folders[i], pattern=".fcs", phenodata=pheno)
-
-    # skip this replicate if no flow sets
-    if(length(flowset) == 0) {
-      next
-    }
-
-		if(clean==TRUE) {
-
-			if(verbose) {
-        cat("Cleaning... ")
+      if(verbose) {
+        cat("Recapitulate rectangular gating... \n")
       }
+      filter = rectangularGateFilter(flowset)
+    }
 
-			flowset = clean.flowSet(flowset, mapping, fluo, scale="Log")
+    # === Filter the data ===
 
-      # === Select filter ===
+    flowset = Subset(flowset, filter)
 
-			filter = NULL
-			if(init.gate == "ellipse") {
-				if(verbose) {
-          cat("Recapitulate ellipsoidal gating... \n")
-        }
-				filter = ellipseGateFilter(flowset)
+  }
 
-			} else if(init.gate == "rectangle") {
-				if(verbose) {
-          cat("Recapitulate rectangular gating... \n")
-        }
-				filter = rectangularGateFilter(flowset)
-			}
+  # === Clustering ===
 
-      # === Filter the data ===
+  flowframe = flowset[[1]]
 
-			flowset = Subset(flowset, filter)
+  fluo_name = get.fluo(fluo.channel, scale.gating)
 
-      # === Clustering ===
+#  cat("fluo_name: ", fluo_name, "\n")
+#  cat("Exprs: ", flowset[[1]]@exprs[,fluo_name], "\n")
 
-			second.peak=NULL
-			if(clusterize) {
-				if(ismapped!=FALSE | fluo!="") {
 
-					if(verbose) {
-            cat("Clustered Gating...")
-          }
+  if(cluster) {
+    if(verbose) {
+      cat("Clustered Gating... \n")
+    }
 
-					if(pattern!="") {
-            plotout = file.path(path,paste("Plots",pattern,sep="_"))
-          } else {
-            plotout = file.path(path,"Plots")
-          }
+    restrict = FALSE
 
-					restrict = FALSE
+    clusters = clustGating(flowframe, fluo.channel=fluo.channel, scale.gating=scale.gating, scale.analysis=scale.analysis, out.path.plot=out.path.plot, levels=clust.levels)
 
-					if(is.list(cluster)) {
-            restrict=cluster[[i]]
-          }
+    if(class(clusters) == 'NULL') {
+      return(error.data("Cluster-gating failed"))
+    }    
 
-					clusters = clustGating(flowset, mapping=mapping, fluo=fluo, scale="Log", cluster_rule=restrict, output=c(out_path, basename(folders[i])), levels=clust_levels)
-
-					flowset = clusters[[1]]
-					second.peak = clusters[[2]]
-				}
+    # propagate error
+    if(class(clusters) == 'list') {
+      if(!is.null(clusters[['error']])) {
+        return(clusters)
       }
-
-      # === Save FCS files ===
-
-
-
-			write.flowSet(flowset, file.path(out_path,paste("Cleaned_data",pattern,sep="_"),"Cluster1",basename(folders[i])),filename=sampleNames(flowset))
-
-			if(class(second.peak) == "flowSet") {
-        write.flowSet(second.peak, file.path(out_path, paste("Cleaned_data",pattern,sep="_"),"Cluster2",basename(folders[i])),filename=sampleNames(second.peak))
-      }
-
-		} else { # no cleaning
-
-			cat("NB: Data processed as is... \n")
-			flowset = nameByWell(flowset)
-			second.peak = NULL
-		}
-
-		if(verbose) {
-      cat("Processing data... \n")
     }
 
-		processed.data = extractData(flowset, mapping, fluo)
-		data[[basename(folders)[i]]] = processed.data[[1]]
-
-		if(verbose) {
-      cat("Writing xlsx... \n")
-    }
-
-		overwrite=FALSE
-		if(i==1) {
-      overwrite=TRUE
-    }
-
-		print(data[basename(folders)[i]])
-
-#		write2xls(file.path(path,paste("Summary_",pattern,".xlsx",sep="")),data[basename(folders)[i]], overwrite=overwrite, verbose=verbose)
-
-		if(!is.null(processed.data[[2]])) {
-			multi.ecdf(processed.data[[2]])
-    }
-
-		if (class(second.peak) == "flowSet") {
-			processed.data = extractData(second.peak, mapping, fluo)
-			mixed[[basename(folders)[i]]] = processed.data[[1]]
-		}
-
-		if(verbose) {
-      cat("Done.\n")
-    }
-	} 
-
-	# == Create summary ==
-
-	if(mode=="replicate") {
-		combined = combine.replicates(data)
-		data = append(data, data.frame(Summary=0), 0)
-		data$Summary = combined
+    flowframe = clusters[[1]]
+    flowframe2 = clusters[[2]]
   }
 
-	if(!length(mixed)) {
-		mixed=NULL
+  data = extractData(flowframe, flowframe2, fluo.channel, scale.gating)
+  data['infile_fcs'] = fcs.path
+  data['outfile_plot'] = out.path.plot
+  data['well_id'] = flowset[[1]]@description$`$WELLID`
+
+  if(clean | cluster) {
+
+    # === Save FCS files ===
+
+    write.FCS(flowframe, file.path(out.path.fcs, output.filename))
+    data['outfile_fcs'] = file.path(out.path.fcs, output.filename)
+    data['well_name'] = flowset[[1]]@description$`$WELLID`
+
+    if(class(flowframe2) == "flowFrame") {
+      write.FCS(flowframe2, file.path(out.path.fcs, output.filename.cluster2))
+      data['outfile_fcs_c2'] = file.path(out.path.fcs, output.filename.cluster2)
+    }
+
   }
 
-	## export to xlsx
-# write2xls(file.path(out_path,paste("Summary_",pattern,".xlsx",sep="")),data,verbose=verbose)
-# write2xls(file.path(out_path,paste("Cluster2_",pattern,".xlsx",sep="")),mixed,verbose=verbose)
+  # === Create summary ===
 
-	if(verbose) {
-    cat("All done!\n")
+  # TODO modify to have some equivalent
+# 
+#  combined = combine.replicates(data)
+#  data = append(data, data.frame(Summary=0), 0)
+#  data$Summary = combined
+
+  if(length(mixed) == 0) {
+    mixed = NULL
   }
 
-	return(data)
+  # TODO return mixed as well
+
+  return(data)
 }

@@ -30,8 +30,7 @@
   <% @dirs.each do |dir| %>
     <li>
       <%= dir[:name] %> - 
-      <%= link_to 'analyze green', :action => 'analyze', :id => @layout.id, :dirname => dir[:name], :channel => 'green' %> - 
-      <%= link_to 'analyze red', :action => 'analyze', :id => @layout.id, :dirname => dir[:name], :channel => 'red' %> - 
+      <%= link_to 'analyze', :action => 'analyze2', :id => @layout.id, :path => dir[:path] %>
       <%= l dir[:created_at] %>
     </li>
   <% end %>

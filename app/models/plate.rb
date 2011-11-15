@@ -17,6 +17,7 @@ class Plate < ActiveRecord::Base
   end
 
 
+
   def self.analyze(plate_layout, fluo_channel, user, dirname)
     begin
 
@@ -145,6 +146,9 @@ class Plate < ActiveRecord::Base
     end
   end
 
+
+
+
   def self.scan_for_plates(path)
     puts path
     plate_names = []
@@ -177,13 +181,10 @@ class Plate < ActiveRecord::Base
     wells.where(["row = ? AND column = ?", row.to_s, col.to_s]).first
   end
 
-  # TODO this is hackish
-  def well_characterization(row, col)
+
+  def well_characterization(row, col, characterization_type)
     well = wells.where(["row = ? AND column = ?", row.to_s, col.to_s]).first
-    if !well
-      raise "#{row} - #{col}"
-    end
-    return well.replicate.characterizations.first
+    return well.replicate.characterization_with_type_name(characterization_type)
   end
 
   def xls_add_plate_sheet(workbook, sheet_name, y_offset=0, x_offset=0)

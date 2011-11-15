@@ -2,13 +2,19 @@
 
   // TODO! waaay too much hardcoding
 
-  function show_plot_for(plate_layout_id, plate_name, row, col) {
-    var base_path = '/flow_cytometer_output/'+plate_layout_id;
-    var filepath = base_path+'/_'+row+col+'_'+plate_name+'_2_processed.png';
-    console.log(filepath);
+  function show_plot_for(row, col) {
+    if((row == 0) || (col == 0)) {
+      return false;
+    }
+    var img_id = 'img_'+row+'_'+col;
+    if(!$(img_id)) {
+      return false;
+    }
     $('plot').src = "";
     $('plot').alt = 'Loading plot for well '+row+col;
-    $('plot').src = filepath;
+
+    $('plot').src = $(img_id).src;
+    console.log($(img_id).src);
   }
 
 </script>
@@ -24,7 +30,7 @@
       <% 9.times do |row| %>
         <tr id='<%= "row_#{row}" %>' <%= "class='topmost'" if row == 0 %>>
         <% 13.times do |col| %>
-         <td id='<%= "row_#{row}_col_#{col}" %>' class='<%= "topmost" if row == 0 %> <%= "leftmost" if col == 0 %>' onmouseover='show_plot_for("<%= @plate.plate_layout.id.to_s %>", "<%= @plate.name %>", "<%= row_to_letter(row) %>", "<%= col_to_twodigit(col) %>")'>
+         <td id='<%= "row_#{row}_col_#{col}" %>' class='<%= "topmost" if row == 0 %> <%= "leftmost" if col == 0 %>' onmouseover='show_plot_for("<%= row %>", "<%= col %>")'>
            <% if (row == 0) && (col > 0) %>
              <div class='row_number'><%= col %></div>
            <% elsif (col == 0) && (row > 0) %>
@@ -32,13 +38,18 @@
            <% end %>
 
            <% if (row > 0) && (col > 0) %>
-             <% @characterization = @plate.well_characterization(row, col) %>
-             <div class='mean'>
-               <%= @characterization.value.round(2) %>
-             </div>
-             <div class='sd'>
-               <%= @characterization.standard_deviation.round(2) %>
-             </div>
+             <% well = @plate.well_at(row, col) %>
+             <% if !well %>
+               <div class='mean'>NA</div>
+             <% else %>
+               <img id="<%= "img_#{row}_#{col}" %>" style='display:none' src="<%= well.file_by_type('plot').filepath %>" />
+               <div class='mean'>
+                 <%= well.replicate.characterization_with_type_name('mean').value.round(2) %>
+               </div>
+               <div class='sd'>
+                 <%= well.replicate.characterization_with_type_name('standard_deviation').value.round(2) %>
+               </div>
+             <% end %>
            <% end %>
 
          </td>

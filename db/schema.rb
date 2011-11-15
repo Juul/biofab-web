@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111110211713) do
+ActiveRecord::Schema.define(:version => 20111115182203) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.integer  "resource_id",   :null => false
@@ -105,10 +105,16 @@ ActiveRecord::Schema.define(:version => 20111110211713) do
 
   create_table "data_files", :force => true do |t|
     t.string   "content_type"
-    t.string   "filepath"
+    t.string   "filename"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "data_file_set_id"
+    t.string   "type_name"
+  end
+
+  create_table "data_files_plate_wells", :id => false, :force => true do |t|
+    t.integer "data_file_id"
+    t.integer "plate_well_id"
   end
 
   create_table "delayed_jobs", :force => true do |t|
@@ -223,6 +229,9 @@ ActiveRecord::Schema.define(:version => 20111110211713) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "comment"
+    t.string   "channel"
+    t.boolean  "background"
+    t.boolean  "reference"
   end
 
   create_table "plate_layouts", :force => true do |t|
@@ -232,14 +241,6 @@ ActiveRecord::Schema.define(:version => 20111110211713) do
     t.integer  "organism_id"
     t.integer  "user_id"
     t.integer  "project_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "plate_well_data_files", :force => true do |t|
-    t.integer  "plate_well_id"
-    t.integer  "data_file_id"
-    t.string   "type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
