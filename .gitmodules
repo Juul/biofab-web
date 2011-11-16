@@ -1,0 +1,3 @@
+[submodule "r_scripts/fcs-analysis"]
+	path = r_scripts/fcs-analysis
+	url = git://github.com/BIOFAB/fcs-analysis.git

@@ -61,6 +61,9 @@ blank_count = 0
 row = 2
 while(true)
 
+  five_prime_utr = nil
+  cds = nil
+
   layout_name = x.cell(row, 2)
   well_name = x.cell(row, 3)
 

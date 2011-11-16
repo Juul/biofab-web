@@ -19,6 +19,9 @@ PlateLayout.all.each do |layout|
     end
     if !channel
       puts "Layout: #{layout.name}. Well: #{well.row}.#{well.column}"
+    else
+      well.channel = well
+#      well.save!
     end
   end
 end
