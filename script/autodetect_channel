@@ -5,16 +5,16 @@ PlateLayout.all.each do |layout|
     channel = nil
     if well.comment
       if well.comment.match(/gfp/i)
-        channel = 'green'
+        channel = 'GRN'
       elsif well.comment.match(/rfp/i)
-        channel = 'red'
+        channel = 'RED'
       end
     end
     if well.eou && well.eou.cds && well.eou.cds.description
       if well.eou.cds.description.match(/gfp/i)
-        channel = 'green'
+        channel = 'GRN'
       elsif well.eou.cds.description.match(/rfp/i)
-        channel = 'red'
+        channel = 'RED'
       end
     end
     if !channel
