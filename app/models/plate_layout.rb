@@ -40,7 +40,7 @@ class PlateLayout < ActiveRecord::Base
     
     r = RSRuby.instance
     
-    script_path = File.join(Rails.root, 'r_scripts', 'fcs-analysis', 'fcs3_analysis')
+    script_path = File.join(Rails.root, 'r_scripts', 'fcs-analysis', 'r_scripts')
     main_script = File.join(script_path, 'fcs3_analysis.r')
     
     out_dir = Dir.mktmpdir('biofab_fcs')
