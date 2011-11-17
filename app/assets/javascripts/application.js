@@ -34,6 +34,7 @@ var FlowCyte = {
         this.enable_autocomplete_and_update('five_prime_utr', p.five_prime_utr_descriptors);
         this.enable_autocomplete_and_update('cds', p.cds_descriptors);
         this.enable_autocomplete_and_update('terminator', p.terminator_descriptors);
+        this.enable_autocomplete_and_update('channel', p.channel_descriptors);
 
         this.update_layout();
 
@@ -123,6 +124,7 @@ var FlowCyte = {
         this.update_field(row, col, 'five_prime_utr', "<5' UTR>", this.p.five_prime_utr_descriptors);
         this.update_field(row, col, 'cds', "<CDS>", this.p.cds_descriptors);
         this.update_field(row, col, 'terminator', "<Terminator>", this.p.terminator_descriptors);
+        this.update_field(row, col, 'channel', "<Channel>", this.p.channel_descriptors);
     },
 
     update_field: function(row, col, master_id, placeholder, autocomplete_data, col_precedence) {
@@ -187,6 +189,8 @@ var FlowCyte = {
     },
 
     pre_save: function() {
+/* disabled check
+
         var row, col, row_id, col_id, i, node_id, placeholder;
         for(row=0; row <= this.plate_rows; row++) {
             row_id = 'row_'+(row);            
@@ -209,7 +213,7 @@ var FlowCyte = {
                 }
             }
         }
-
+*/
         return true;
     }
 

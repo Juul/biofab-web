@@ -23,13 +23,24 @@ class PlateLayout < ActiveRecord::Base
   end
 
 
+  def get_well_channels
+    well_channels = {}
+    wells.each do |well|
+      if well.channel.blank?
+        raise "plate layout well '#{well.name}' in plate layout '#{name}' has no fluorescence channel"
+      end
+      well_channels[well.name] = well.channel
+    end
+    well_channels
+  end
+
   def analyze_replicate_dir(replicate_dir, user)
 
     require 'tmpdir'
     
     r = RSRuby.instance
     
-    script_path = File.join(Rails.root, 'r_scripts', 'fcs3_analysis')
+    script_path = File.join(Rails.root, 'r_scripts', 'fcs-analysis', 'fcs3_analysis')
     main_script = File.join(script_path, 'fcs3_analysis.r')
     
     out_dir = Dir.mktmpdir('biofab_fcs')
@@ -37,7 +48,8 @@ class PlateLayout < ActiveRecord::Base
     dump_file = File.join(Rails.root, 'out.dump')
     
     # fluo = 'RED'
-    fluo = 'GRN'
+    fluo = 'GRN' # fallback fluo if not defined for channel
+
     #init_gate = 'ellipse'
     init_gate = 'rectangle'
     
@@ -54,7 +66,7 @@ class PlateLayout < ActiveRecord::Base
     r.setwd(script_path)
     r.source(main_script)
 
-    data_set = Exceptor.call_r_func(r, r.batch, out_dir, fcs_file_paths, :fluo_channel => fluo, :init_gate => init_gate, :verbose => true)
+    data_set = Exceptor.call_r_func(r, r.batch, out_dir, fcs_file_paths, :fluo_channel => fluo, :well_channels => get_well_channels, :init_gate => init_gate, :verbose => true)
     
     # TODO remove this debug code
     f = File.new(dump_file, 'w+')
@@ -200,14 +212,17 @@ class PlateLayout < ActiveRecord::Base
     return '' if !well
 
     # TODO ugly
-    if part_type_name == 'organism'
-      return '' if !well.organism
-      return well.organism.descriptor
+    if part_type_name == 'organism' 
+      part = well.organism
+      return '' if !part
+      part.descriptor
+    elsif part_type_name == 'channel'
+      return '' if well.channel.blank?
+      well.channel
     else
       part = well.eou.send(part_type_name)
-
       return '' if !part
-      return part.descriptor
+      part.descriptor
     end
 
   end

@@ -63,18 +63,20 @@ class PlateLayoutController < ApplicationController
 
   def show
 
-    # TODO should get this from db somehow
+    # TODO should maybe get this from db somehow
     @field_names = ['organism',
                     'promoter',
                     'five_prime_utr',
                     'cds',
-                    'terminator']
+                    'terminator',
+                    'channel']
 
     @placeholder_names = ['Organism',
                           'Promoter',
                           "5' UTR",
                           'CDS',
-                          'Terminator']
+                          'Terminator',
+                          'Channel']
                         
 
     if params['id']
@@ -89,6 +91,8 @@ class PlateLayoutController < ApplicationController
     @terminator_descriptors = Part.terminator_descriptors
     @organism_descriptors = Organism.descriptors
 
+    # TODO should be in database
+    @channel_descriptors = ['GRN', 'RED', 'ALL', 'NONE']
   end
 
   def save
@@ -96,7 +100,7 @@ class PlateLayoutController < ApplicationController
     if params['id']
       layout = PlateLayout.find(params['id'])
       layout.attributes = params['plate_layout']
-      old_wells = layout.wells
+      old_wells = layout.wells.all
       layout.wells = []
     else
       layout = PlateLayout.new(params['plate_layout'])
@@ -115,9 +119,17 @@ class PlateLayoutController < ApplicationController
 #      end
     end
 
-    species, strain, substrain = params['plate_layout_organism'].split(': ')
-    layout.organism = Organism.where(["species = ? AND strain = ? AND substrain = ?", species, strain, substrain]).first
+    organism_parts = params['plate_layout_organism'].split(': ')
+    if organism_parts.length == 2
+      species, strain = organism_parts
+      layout.organism = Organism.where(["species = ? AND strain = ?", species, strain]).first
+    elsif organism_parts.length == 3
+      species, strain, substrain = organism_parts
+      layout.organism = Organism.where(["species = ? AND strain = ? AND substrain = ?", species, strain, substrain]).first
+    end
 
+
+    layout.channel = params['plate_layout_channel']
 
     layout.eou = Eou.new
     layout.eou.promoter = Part.find_by_biofab_id(params['plate_layout_eou']['promoter'].split(': ')[0])
@@ -139,8 +151,18 @@ class PlateLayoutController < ApplicationController
           next if descriptor == ''
           
           if part_type == 'organism'
-            species, strain, substrain = descriptor.split(': ')
-            well.organism = Organism.where(["species = ? AND strain = ? AND substrain = ?", species, strain, substrain]).first
+            organism_parts = descriptor.split(': ')
+            if organism_parts.length == 2
+              species, strain = organism_parts
+              well.organism = Organism.where(["species = ? AND strain = ?", species, strain]).first
+            elsif organism_parts.length == 3
+              species, strain, substrain = organism_parts
+              well.organism = Organism.where(["species = ? AND strain = ? AND substrain = ?", species, strain, substrain]).first
+            end
+
+
+          elsif part_type == 'channel'
+            well.channel = descriptor
           else
             biofab_id, desc = descriptor.split(': ')
             part = Part.where(["biofab_id = ?", biofab_id]).includes(:part_type).first
@@ -165,9 +187,9 @@ class PlateLayoutController < ApplicationController
     if layout.save
       if old_wells
         old_wells.each do |well|
-          well.destroy
+          well.delete
         end
-      end
+     end
       redirect_to :action => 'show', :id => layout.id
     else
       render :text => "Oh no... something bad happened. Error handling is really rather minimal for plate layouts right now. Sorry about that."

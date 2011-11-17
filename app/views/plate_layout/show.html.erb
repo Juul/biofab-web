@@ -6,7 +6,8 @@
       promoter_descriptors: <%=raw @promoter_descriptors.to_json %>,
       five_prime_utr_descriptors: <%=raw @five_prime_utr_descriptors.to_json %>,
       cds_descriptors: <%=raw @cds_descriptors.to_json %>,
-      terminator_descriptors: <%=raw @terminator_descriptors.to_json %>
+      terminator_descriptors: <%=raw @terminator_descriptors.to_json %>,
+      channel_descriptors: <%=raw @channel_descriptors.to_json %>
     });
   });
 
@@ -47,6 +48,7 @@
       <li>5' UTR: <input name='plate_layout_eou[five_prime_utr]' id='five_prime_utr' placeholder='<variable>' value='<%= @layout.eou.five_prime_utr.descriptor if @layout.eou && @layout.eou.five_prime_utr %>' /></li>
       <li>CDS: <input name='plate_layout_eou[cds]' id='cds' placeholder='<variable>' value='<%= @layout.eou.cds.descriptor if @layout.eou && @layout.eou.cds %>' /></li>
       <li>Terminator: <input name='plate_layout_eou[terminator]' id='terminator' placeholder='<variable>' value='<%= @layout.eou.terminator.descriptor if @layout.eou && @layout.eou.terminator %>' /></li>
+      <li>Channel: <input name='plate_layout_channel' id='channel' placeholder='<variable>' value='<%= @layout.channel if !@layout.channel.blank?  %>' /></li>
       <li>Hide plate-global settings in plate layout: <input name='plate_layout[hide_global_wells]' id='hide_master' type='checkbox' <%= "checked='checked'" if @layout.hide_global_wells %> /></li>
     </ul>
 
@@ -64,7 +66,13 @@
              <div class='col_number'><%= row_to_letter(row) %></div>
            <% end %>
 
-           <% if (row > 0) || (col > 0) %>
+           <% if (row == 0) && (col == 0) %>
+
+             <% @placeholder_names.each_index do |i| %> 
+               <input type='text' class='table_autocomplete' disabled='disabled' placeholder="<%= @placeholder_names[i] %>" />
+             <% end %>
+
+           <% else %>
              <% @field_names.each_index do |i| %> 
                <input type='text' class='table_autocomplete' id="<%= "row_#{row}_col_#{col}_#{@field_names[i]}" %>" name="<%= "data[#{row}][#{col}][#{@field_names[i]}]" %>" placeholder="<%=h "<#{@placeholder_names[i]}>" %>" value="<%= @layout.well_descriptor_for(@field_names[i], row, col) %>" />
              <% end %>

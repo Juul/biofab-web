@@ -11,7 +11,11 @@ class Organism < ActiveRecord::Base
   end
 
   def descriptor
-    "#{species}: #{strain}: #{substrain}"
+    if !substrain.strip.blank?
+      "#{species}: #{strain}: #{substrain}"
+    else
+      "#{species}: #{strain}"
+    end
   end
 
   def brief_descriptor
@@ -24,10 +28,6 @@ class Organism < ActiveRecord::Base
     else
       return "NA"
     end
-  end
-
-  def descriptor
-    [species, strain, substrain].compact.join(': ')
   end
 
   def to_s
