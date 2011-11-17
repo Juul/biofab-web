@@ -20,7 +20,7 @@ PlateLayout.all.each do |layout|
     if !channel
       puts "Layout: #{layout.name}. Well: #{well.row}.#{well.column}"
     else
-      well.channel = well
+      well.channel = channel
       well.save!
     end
   end
