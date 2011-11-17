@@ -26,9 +26,7 @@ class PlateLayout < ActiveRecord::Base
   def get_well_channels
     well_channels = {}
     wells.each do |well|
-      if well.channel.blank?
-        raise "plate layout well '#{well.name}' in plate layout '#{name}' has no fluorescence channel"
-      end
+      next if well.channel.blank?
       well_channels[well.name] = well.channel
     end
     well_channels
