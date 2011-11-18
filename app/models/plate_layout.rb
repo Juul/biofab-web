@@ -64,7 +64,7 @@ class PlateLayout < ActiveRecord::Base
     r.setwd(script_path)
     r.source(main_script)
 
-    data_set = Exceptor.call_r_func(r, r.batch, out_dir, fcs_file_paths, :fluo_channel => fluo, :well_channels => get_well_channels, :init_gate => init_gate, :verbose => true)
+    data_set = Exceptor.call_r_func(r, r.batch, out_dir, fcs_file_paths, :fluo_channel => fluo, :well_channels => get_well_channels, :init_gate => init_gate, :verbose => true, :min_cells => 100)
     
     # TODO remove this debug code
     f = File.new(dump_file, 'w+')
