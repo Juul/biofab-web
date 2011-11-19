@@ -388,7 +388,7 @@ class Plate < ActiveRecord::Base
     var_sheet = xls_add_plate_sheet(workbook, 'Variance')
 
     wells.each do |well|
-      characterization = well.replicate.characterizations.first
+      characterization = well.replicate.characterization_with_type_name('mean')
       value_sheet[well.row.to_i, well.column.to_i] = characterization.performance_with_type_name('mean_of_means')
       sd_sheet[well.row.to_i, well.column.to_i] = characterization.performance_with_type_name('standard_deviation_of_means')
       var_sheet[well.row.to_i, well.column.to_i] = characterization.performance_with_type_name('variance_of_means')
