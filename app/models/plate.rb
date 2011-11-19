@@ -389,9 +389,9 @@ class Plate < ActiveRecord::Base
 
     wells.each do |well|
       characterization = well.replicate.characterization_with_type_name('mean')
-      value_sheet[well.row.to_i, well.column.to_i] = characterization.performance_with_type_name('mean_of_means')
-      sd_sheet[well.row.to_i, well.column.to_i] = characterization.performance_with_type_name('standard_deviation_of_means')
-      var_sheet[well.row.to_i, well.column.to_i] = characterization.performance_with_type_name('variance_of_means')
+      value_sheet[well.row.to_i, well.column.to_i] = characterization.performance_with_type_name('mean_of_means').value
+      sd_sheet[well.row.to_i, well.column.to_i] = characterization.performance_with_type_name('standard_deviation_of_means').value
+      var_sheet[well.row.to_i, well.column.to_i] = characterization.performance_with_type_name('variance_of_means').value
     end
 
     out_path = File.join(Rails.root, 'public', "plate_#{id}_performance.xls")
