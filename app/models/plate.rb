@@ -17,7 +17,7 @@ class Plate < ActiveRecord::Base
   end
 
 
-
+  # TODO old code, this now happens in plate_layout.rb
   def self.analyze(plate_layout, fluo_channel, user, dirname)
     begin
 
@@ -184,8 +184,136 @@ class Plate < ActiveRecord::Base
 
   def well_characterization(row, col, characterization_type)
     well = wells.where(["row = ? AND column = ?", row.to_s, col.to_s]).first
+    if !well || !well.replicate
+      return nil
+    end
     return well.replicate.characterization_with_type_name(characterization_type)
   end
+
+  # get all of the data files associated with all plate wells,
+  # that have a specific type_name (e.g. all plots)
+  def well_files_by_type_name(type_name)
+    DataFile.joins(:plate_wells => :plate).where(["plates.id = ? AND data_files.type_name = ?", id, type_name])
+  end
+
+  # re-do the flow cytometer analysis based on the plate layout and the original fcs files
+  # this will only give a new result if either:
+  #   The plate layout has changed
+  #   or the R script has changed
+  #   or the analyze_replicate_dir method has changed
+  def re_analyze
+    require 'tmpdir'
+    
+    r = RSRuby.instance
+    
+    script_path = File.join(Rails.root, 'r_scripts', 'fcs-analysis', 'r_scripts')
+    main_script = File.join(script_path, 'fcs3_analysis.r')
+    
+    out_dir = Dir.mktmpdir('biofab_fcs')
+    
+    dump_file = File.join(Rails.root, 'out.dump')
+    
+    # fluo = 'RED'
+    fluo = 'GRN' # fallback fluo if not defined for channel
+
+    #init_gate = 'ellipse'
+    init_gate = 'rectangle'
+    
+    # retrieve the set of original fcs files for this plate
+    fcs_file_paths = well_files_by_type_name('original_fcs_file')
+        
+    # retrieve the fluorescence channels for each well from the plate layout
+    well_channels = plate_layout.get_well_channels
+
+    r.setwd(script_path)
+    r.source(main_script)
+
+    data_set = Exceptor.call_r_func(r, r.batch, out_dir, fcs_file_paths, :fluo_channel => fluo, :well_channels => well_channels, :init_gate => init_gate, :verbose => true, :min_cells => 100)
+    
+    # TODO remove this debug code
+    f = File.new(dump_file, 'w+')
+    f.puts(data_set.inspect)
+    f.close
+    
+    plate = Plate.new
+    plate.plate_layout = self
+    plate.name = self.name # TODO what would be a good name?
+
+    # create wells and characterizations based on analysis data
+    plate.create_wells_from_r_data(data_set)
+
+    plate.save!
+
+    delete # delete self
+
+    plate
+  end
+
+
+  def create_wells_from_r_data(data_set)
+
+    data_set.each_pair do |input_file_path, data|
+
+      create_well_from_r_data(input_file_path, data)
+
+    end
+  end
+
+  def create_well_from_r_data(input_file_path, data)
+      if !data || !data['error'].blank?
+        return nil
+      end
+      
+      well = PlateWell.new
+      plate.wells << well
+
+      original_fcs_file = DataFile.from_local_file(input_file_path, 'original_fcs_file')
+      well.files << original_fcs_file
+
+      plot_file = DataFile.from_local_file(data['outfile_plot'], 'plot')
+      well.files << plot_file
+
+      cleaned_fcs_file = DataFile.from_local_file(data['outfile_fcs'], 'cleaned_fcs_file')
+      well.files << cleaned_fcs_file
+
+      well.row, well.column = PlateWell.well_name_to_row_col(data['well_name'])
+      well.replicate = Replicate.new
+      
+      c = Characterization.new_with_type('mean')
+      c.value = data['mean']
+      c.fluo_channel = data['fluo_channel']
+      well.replicate.characterizations << c
+
+      c = Characterization.new_with_type('standard_deviation')
+      c.value = data['standard_deviation']
+      c.fluo_channel = data['fluo_channel']
+      well.replicate.characterizations << c
+
+      c = Characterization.new_with_type('variance')
+      c.value = data['variance']
+      c.fluo_channel = data['fluo_channel']
+      well.replicate.characterizations << c
+
+      c = Characterization.new_with_type('event_count')
+      c.value = data['num_events']
+      c.fluo_channel = data['fluo_channel']
+      well.replicate.characterizations << c
+
+      c = Characterization.new_with_type('cluster_count')
+      c.value = data['num_clusters']
+      c.fluo_channel = data['fluo_channel']
+      well.replicate.characterizations << c
+
+      # TODO unpretty
+      c = Characterization.new_with_type('events')
+      c.value = 0.0
+      c.fluo_channel = data['fluo_channel']
+      c.description = data['events']
+      well.replicate.characterizations << c
+      
+      well.save!
+  end
+
 
   def xls_add_plate_sheet(workbook, sheet_name, y_offset=0, x_offset=0)
     sheet = workbook.create_worksheet

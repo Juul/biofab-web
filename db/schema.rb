@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111117215343) do
+ActiveRecord::Schema.define(:version => 20111119092527) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.integer  "resource_id",   :null => false
@@ -84,6 +84,7 @@ ActiveRecord::Schema.define(:version => 20111117215343) do
     t.datetime "updated_at"
     t.float    "value"
     t.float    "standard_deviation"
+    t.string   "fluo_channel"
   end
 
   create_table "characterizations_performances", :id => false, :force => true do |t|

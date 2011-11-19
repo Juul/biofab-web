@@ -22,14 +22,26 @@ class PlateLayout < ActiveRecord::Base
     end
   end
 
-
-  def get_well_channels
+  # get a hash where the keys are the well names (e.g. B03)
+  # and the values are the fluorescence channels (e.g. GRN or RED)
+  # this is used to pass this association to the R analysis scripts
+  def get_well_channels # (poor channels. get well soon!)
     well_channels = {}
     wells.each do |well|
       next if well.channel.blank?
       well_channels[well.name] = well.channel
     end
     well_channels
+  end
+
+
+  # re-run analysis for all plates
+  # this will create new plates with new wells
+  # and delete the old plates and their wells
+  def re_analyze_plates
+    plates.each do |plate|
+      plate.re_analyze
+    end
   end
 
   def analyze_replicate_dir(replicate_dir, user)
@@ -75,52 +87,7 @@ class PlateLayout < ActiveRecord::Base
     plate.plate_layout = self
     plate.name = self.name # TODO what would be a good name?
 
-    data_set.each_pair do |input_file_path, data|
-
-      if !data || !data['error'].blank?
-        next
-      end
-      
-      well = PlateWell.new
-      plate.wells << well
-
-      original_fcs_file = DataFile.from_local_file(input_file_path, 'original_fcs_file')
-      well.files << original_fcs_file
-
-      plot_file = DataFile.from_local_file(data['outfile_plot'], 'plot')
-      well.files << plot_file
-
-      well.row, well.column = PlateWell.well_name_to_row_col(data['well_name'])
-      well.replicate = Replicate.new
-      
-      c = Characterization.new_with_type('mean')
-      c.value = data['mean']
-      well.replicate.characterizations << c
-
-      c = Characterization.new_with_type('standard_deviation')
-      c.value = data['standard_deviation']
-      well.replicate.characterizations << c
-
-      c = Characterization.new_with_type('variance')
-      c.value = data['variance']
-      well.replicate.characterizations << c
-
-      c = Characterization.new_with_type('event_count')
-      c.value = data['event_count']
-      well.replicate.characterizations << c
-
-      c = Characterization.new_with_type('cluster_count')
-      c.value = data['cluster_count']
-      well.replicate.characterizations << c
-
-      # TODO unpretty
-      c = Characterization.new_with_type('events')
-      c.value = 0.0
-      c.description = data['events']
-      well.replicate.characterizations << c
-      
-      well.save!
-    end
+    plate.create_wells_from_r_data(data_set)
 
     plate.save!
 
@@ -224,5 +191,6 @@ class PlateLayout < ActiveRecord::Base
     end
 
   end
+
 
 end
