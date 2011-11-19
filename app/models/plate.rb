@@ -385,11 +385,13 @@ class Plate < ActiveRecord::Base
     layout_sheet = xls_add_plate_layout_sheet(workbook)
     value_sheet = xls_add_plate_sheet(workbook, 'Performance')
     sd_sheet = xls_add_plate_sheet(workbook, 'Standard deviation')
+    var_sheet = xls_add_plate_sheet(workbook, 'Variance')
 
     wells.each do |well|
-      performance = well.replicate.characterizations.first.performances.first
-      value_sheet[well.row.to_i, well.column.to_i] = performance.value
-      sd_sheet[well.row.to_i, well.column.to_i] = performance.standard_deviation
+      characterization = well.replicate.characterizations.first
+      value_sheet[well.row.to_i, well.column.to_i] = characterization.performance_with_type_name('mean_of_means')
+      sd_sheet[well.row.to_i, well.column.to_i] = characterization.performance_with_type_name('standard_deviation_of_means')
+      var_sheet[well.row.to_i, well.column.to_i] = characterization.performance_with_type_name('variance_of_means')
     end
 
     out_path = File.join(Rails.root, 'public', "plate_#{id}_performance.xls")
