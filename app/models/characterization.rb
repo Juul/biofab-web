@@ -14,7 +14,7 @@ class Characterization < ActiveRecord::Base
     self.characterization_type = CharacterizationType.find_by_name(type_name)
   end
 
-  def performance_with_type_name
+  def performance_with_type_name(type_name)
     performances.joins(:performance_type).where(["performance_types.name = ?", type_name]).first
   end
 
