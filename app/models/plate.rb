@@ -393,13 +393,13 @@ class Plate < ActiveRecord::Base
       next if !characterization
 
       perf = characterization.performance_with_type_name('mean_of_means')
-      value_sheet[well.row.to_i, well.column.to_i] = (perf) ? perf.value : 'NA'
+      value_sheet[well.row.to_i, well.column.to_i] = (perf && !perf.value.blank?) ? perf.value : 'NA'
 
       perf = characterization.performance_with_type_name('standard_deviation_of_means')
-      sd_sheet[well.row.to_i, well.column.to_i] = (perf) ? perf.value : 'NA'
+      sd_sheet[well.row.to_i, well.column.to_i] = (perf && !perf.value.blank?) ? perf.value : 'NA'
 
       perf = characterization.performance_with_type_name('variance_of_means')
-      var_sheet[well.row.to_i, well.column.to_i] = (perf) ? perf.value : 'NA'
+      var_sheet[well.row.to_i, well.column.to_i] = (perf && !perf.value.blank?) ? perf.value : 'NA'
 
     end
 
